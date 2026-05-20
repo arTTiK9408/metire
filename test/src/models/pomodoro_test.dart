@@ -4,7 +4,7 @@ import 'package:metire/src/models/pomodoro.dart';
 void main() {
   group("pomodoro >", () {
     test(
-      "deve iniciar com 1500 em secRemaining e isRunning false ao executar",
+      "deve iniciar com secRemaining 1500 e isRunning false ao executar",
       () {
         final pomodoro = Pomodoro();
         expect(pomodoro.secRemaining, equals(1500));
