@@ -2,6 +2,7 @@ import 'package:test/test.dart';
 import 'package:metire/src/models/pomodoro.dart';
 
 // commit 11c23cf - pinguino app
+// https://github.com/minhosong88/flutter_Pomodoro_app/blob/main/lib/screens/home_screen.dart
 
 void main() {
   group('pomodoro -', () {
@@ -32,22 +33,5 @@ void main() {
       pomodoro.pause();
       expect(pomodoro.isRunning, isFalse);
     });
-    // test('pause() deve incrementar pauseCount em 1', () {
-    //   pomodoro.start();
-    //   pomodoro.pause();
-    //   expect(pomodoro.pauseCount, equals(1));
-    // });
-    // test('pause() deve zerar pauseCount se > 4', () {
-    //   pomodoro.pauseCount = 4;
-    //   pomodoro.start();
-    //   pomodoro.pause();
-    //   expect(pomodoro.pauseCount, equals(0));
-    // });
-    // test('pause() deve incrementar cycleCount se pauseCount > 4', () {
-    //   pomodoro.pauseCount = 4;
-    //   pomodoro.start();
-    //   pomodoro.pause();
-    //   expect(pomodoro.cycleCount, equals(1));
-    // });
   });
 }

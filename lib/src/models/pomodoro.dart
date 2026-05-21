@@ -10,11 +10,5 @@ class Pomodoro {
 
   void pause() {
     isRunning = false;
-    // if (pauseCount < 4) {
-    //   ++pauseCount;
-    // } else {
-    //   pauseCount = 0;
-    //   ++cycleCount;
-    // }
   }
 }
