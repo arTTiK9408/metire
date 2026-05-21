@@ -23,7 +23,7 @@ void main() {
     test('cycleCount deve ser 0 ao iniciar', () {
       expect(pomodoro.cycleCount, equals(0));
     });
-    test('mode dever ser focus ao iniciar', () {
+    test('mode deve ser focus ao iniciar', () {
       expect(pomodoro.mode, equals(PomodoroMode.focus));
     });
 
