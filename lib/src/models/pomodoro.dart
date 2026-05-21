@@ -1,4 +1,7 @@
+enum PomodoroMode { focus, shortPause, longPause }
+
 class Pomodoro {
+  PomodoroMode mode = PomodoroMode.focus;
   bool isRunning = false;
   int secRemaining = 1500;
   int pauseCount = 0;

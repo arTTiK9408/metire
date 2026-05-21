@@ -23,6 +23,9 @@ void main() {
     test('cycleCount deve ser 0 ao iniciar', () {
       expect(pomodoro.cycleCount, equals(0));
     });
+    test('mode dever ser focus ao iniciar', () {
+      expect(pomodoro.mode, equals(PomodoroMode.focus));
+    });
 
     test('start() deve alternar isRunning para true', () {
       pomodoro.start();
@@ -33,5 +36,10 @@ void main() {
       pomodoro.pause();
       expect(pomodoro.isRunning, isFalse);
     });
+    test('tick() deve decrementar secRemaining se isRunning = true', () {});
+    test('tick() deve incrementar cycleCount se secRemaining = 0', () {});
+    test('tick() deve alterar mode para shortPause se cycleCount > 4', () {});
+    test('tick() deve alterar mode para longPause se cycleCount = 4', () {});
+    test('tick() deve alterar mode para focus se não for focus', () {});
   });
 }
