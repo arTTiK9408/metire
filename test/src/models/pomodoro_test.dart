@@ -36,10 +36,17 @@ void main() {
       pomodoro.pause();
       expect(pomodoro.isRunning, isFalse);
     });
-    test('tick() deve decrementar secRemaining se isRunning = true', () {});
-    test('tick() deve incrementar cycleCount se secRemaining = 0', () {});
-    test('tick() deve alterar mode para shortPause se cycleCount > 4', () {});
-    test('tick() deve alterar mode para longPause se cycleCount = 4', () {});
-    test('tick() deve alterar mode para focus se não for focus', () {});
+
+    test('tick() deve decrementar secRemaining em 1', () {});
+    test('tick() não decrementa se pausado', () {});
+    test('quando secRemaining chega a 0, cycleCount incrementa', () {});
+    test('quando ciclo termina, secRemaining reseta para 1500', () {});
+    test('quando ciclo termina, isRunning vira false', () {});
+    test('pause() incrementa pauseCount', () {});
+    test('Deve iniciar no modo Foco por padrão', () {});
+    test('tick() deve reduzir 1 segundo se estiver rodando', () {});
+    test('Quando o foco chega a 0 pela primeira vez, deve mudar para pausaCurta com 300s', () {});
+    test('Após completar o 4º ciclo de foco, a próxima pausa deve ser Longa (900s)', () {});
+    test('Quando a pausa acaba, deve retornar para o modo Foco (1500s)', () {});
   });
 }
