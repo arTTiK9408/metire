@@ -43,6 +43,7 @@ void main() {
     test('quando ciclo termina, secRemaining reseta para 1500', () {});
     test('quando ciclo termina, isRunning vira false', () {});
     test('pause() incrementa pauseCount', () {});
+
     test('Deve iniciar no modo Foco por padrão', () {});
     test('tick() deve reduzir 1 segundo se estiver rodando', () {});
     test('Quando o foco chega a 0 pela primeira vez, deve mudar para pausaCurta com 300s', () {});
