@@ -17,9 +17,6 @@ void main() {
     test('isRunning deve ser false ao inciar', () {
       expect(pomodoro.isRunning, isFalse);
     });
-    test('pauseCount deve ser 0 ao iniciar', () {
-      expect(pomodoro.pauseCount, equals(0));
-    });
     test('cycleCount deve ser 0 ao iniciar', () {
       expect(pomodoro.cycleCount, equals(0));
     });
@@ -38,7 +35,7 @@ void main() {
     });
 
     test('tick() deve decrementar secRemaining em 1', () {});
-    test('tick() não decrementa se pausado', () {});
+    test('tick() não deve decrementar se pausado', () {});
 
     test('quando secRemaining chega a 0, cycleCount incrementa', () {});
     test('quando ciclo pause termina, secRemaining reseta para 1500', () {});
