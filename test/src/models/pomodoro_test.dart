@@ -38,7 +38,7 @@ void main() {
     test('tick() não deve decrementar se pausado', () {});
 
     test('quando secRemaining chega a 0, cycleCount incrementa', () {});
-    test('quando ciclo pause termina, secRemaining reseta para 1500', () {});
+    test('quando ciclo pause termina, secRemaining reinicia em 1500', () {});
     test('quando ciclo focus termina, isRunning vira false', () {});
 
     test(
