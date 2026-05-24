@@ -6,49 +6,101 @@ import 'package:metire/src/models/pomodoro.dart';
 
 void main() {
   group('pomodoro -', () {
-    late Pomodoro pomodoro;
+    late Pomodoro p;
     setUp(() {
-      pomodoro = Pomodoro();
+      p = Pomodoro();
     });
 
     test('secRemaining deve ser 1500 ao iniciar', () {
-      expect(pomodoro.secRemaining, equals(1500));
+      expect(p.secRemaining, equals(1500));
     });
     test('isRunning deve ser false ao inciar', () {
-      expect(pomodoro.isRunning, isFalse);
+      expect(p.isRunning, isFalse);
     });
     test('cycleCount deve ser 0 ao iniciar', () {
-      expect(pomodoro.cycleCount, equals(0));
+      expect(p.cycleCount, equals(0));
     });
     test('mode deve ser focus ao iniciar', () {
-      expect(pomodoro.mode, equals(PomodoroMode.focus));
+      expect(p.mode, equals(PomodoroMode.focus));
     });
 
     test('start() deve alternar isRunning para true', () {
-      pomodoro.start();
-      expect(pomodoro.isRunning, isTrue);
+      p.start();
+      expect(p.isRunning, isTrue);
     });
     test('pause() deve alterar isRunning para false', () {
-      pomodoro.start();
-      pomodoro.pause();
-      expect(pomodoro.isRunning, isFalse);
+      p.start();
+      p.pause();
+      expect(p.isRunning, isFalse);
     });
 
-    test('tick() deve decrementar secRemaining em 1', () {});
-    test('tick() não deve decrementar se pausado', () {});
+    test('tick() deve decrementar secRemaining em 1', () {
+      p.start();
+      p.tick();
+      expect(p.secRemaining, equals(1499));
+    });
+    test('tick() não deve decrementar se pausado', () {
+      p.tick();
+      expect(p.secRemaining, equals(1500));
+    });
 
-    test('quando secRemaining chega a 0, cycleCount incrementa', () {});
-    test('quando ciclo pause termina, secRemaining reinicia em 1500', () {});
-    test('quando ciclo focus termina, isRunning vira false', () {});
+    test('quando secRemaining chega a 0, cycleCount incrementa', () {
+      p.secRemaining = 1;
+      p.start();
+      p.tick();
+      expect(p.cycleCount, equals(1));
+    });
+    test('quando ciclo pause termina, secRemaining reinicia em 1500', () {
+      p.mode = PomodoroMode.shortPause;
+      p.secRemaining = 1;
+      p.start();
+      p.tick();
+      expect(p.mode, equals(PomodoroMode.focus));
+      expect(p.secRemaining, equals(1500));
+    });
+    test('quando ciclo focus termina, isRunning vira false', () {
+      p.secRemaining = 1;
+      p.start();
+      p.tick();
+      expect(p.isRunning, isFalse);
+    });
 
-    test(
-      'Quando o foco chega a 0 pela primeira vez, deve mudar para pausaCurta com 300s',
-      () {},
-    );
+    test('focus termina com menos de 4 ciclos → shortPause com 300s', () {
+      p.secRemaining = 1;
+      p.start();
+      p.tick();
+      expect(p.mode, equals(PomodoroMode.shortPause));
+      expect(p.secRemaining, equals(300));
+    });
     test(
       'Após completar o 4º ciclo de foco, a próxima pausa deve ser Longa (900s)',
-      () {},
+      () {
+        p.cycleCount = 3;
+        p.secRemaining = 1;
+        p.start();
+        p.tick();
+        expect(p.mode, equals(PomodoroMode.longPause));
+        expect(p.secRemaining, equals(900));
+        expect(p.cycleCount, equals(0));
+      },
     );
-    test('Quando a pausa acaba, deve retornar para o modo Foco (1500s)', () {});
+    test('Quando a pausa acaba, deve retornar para o modo Foco (1500s)', () {
+      p.mode = PomodoroMode.longPause;
+      p.secRemaining = 1;
+      p.start();
+      p.tick();
+      expect(p.mode, equals(PomodoroMode.focus));
+      expect(p.secRemaining, equals(1500));
+      expect(p.cycleCount, equals(0));
+    });
+    test('após pausa curta, cycleCount não é zerado', () {
+      p.cycleCount = 2;
+      p.mode = PomodoroMode.shortPause;
+      p.secRemaining = 1;
+      p.start();
+      p.tick();
+      expect(p.mode, equals(PomodoroMode.focus));
+      expect(p.cycleCount, equals(2));
+    });
   });
 }
