@@ -65,15 +65,18 @@ void main() {
       expect(p.isRunning, isFalse);
     });
 
-    test('focus termina com menos de 4 ciclos → shortPause com 300s', () {
-      p.secRemaining = 1;
-      p.start();
-      p.tick();
-      expect(p.mode, equals(PomodoroMode.shortPause));
-      expect(p.secRemaining, equals(300));
-    });
     test(
-      'Após completar o 4º ciclo de foco, a próxima pausa deve ser Longa (900s)',
+      'quando focus termina com menos de 4 ciclos → shortPause com 300s',
+      () {
+        p.secRemaining = 1;
+        p.start();
+        p.tick();
+        expect(p.mode, equals(PomodoroMode.shortPause));
+        expect(p.secRemaining, equals(300));
+      },
+    );
+    test(
+      'quando terminar o 4º ciclo de focus, a próxima pausa deve ser longa (900s)',
       () {
         p.cycleCount = 3;
         p.secRemaining = 1;
@@ -84,15 +87,18 @@ void main() {
         expect(p.cycleCount, equals(0));
       },
     );
-    test('quando pausa longa termina, volta para focus com 1500s e zera cycleCount', () {
-      p.mode = PomodoroMode.longPause;
-      p.secRemaining = 1;
-      p.start();
-      p.tick();
-      expect(p.mode, equals(PomodoroMode.focus));
-      expect(p.secRemaining, equals(1500));
-      expect(p.cycleCount, equals(0));
-    });
+    test(
+      'quando pausa longa termina, volta para focus com 1500s e zera cycleCount',
+      () {
+        p.mode = PomodoroMode.longPause;
+        p.secRemaining = 1;
+        p.start();
+        p.tick();
+        expect(p.mode, equals(PomodoroMode.focus));
+        expect(p.secRemaining, equals(1500));
+        expect(p.cycleCount, equals(0));
+      },
+    );
     test('após pausa curta, cycleCount não é zerado', () {
       p.cycleCount = 2;
       p.mode = PomodoroMode.shortPause;
