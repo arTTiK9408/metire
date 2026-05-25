@@ -14,7 +14,7 @@ void main() {
     test('secRemaining deve ser 1500 ao iniciar', () {
       expect(p.secRemaining, equals(1500));
     });
-    test('isRunning deve ser false ao inciar', () {
+    test('isRunning deve ser false ao iniciar', () {
       expect(p.isRunning, isFalse);
     });
     test('cycleCount deve ser 0 ao iniciar', () {
@@ -50,7 +50,7 @@ void main() {
       p.tick();
       expect(p.cycleCount, equals(1));
     });
-    test('quando ciclo pause termina, secRemaining reinicia em 1500', () {
+    test('quando pausa curta termina, volta para focus com 1500s', () {
       p.mode = PomodoroMode.shortPause;
       p.secRemaining = 1;
       p.start();
@@ -84,7 +84,7 @@ void main() {
         expect(p.cycleCount, equals(0));
       },
     );
-    test('Quando a pausa acaba, deve retornar para o modo Foco (1500s)', () {
+    test('quando pausa longa termina, volta para focus com 1500s e zera cycleCount', () {
       p.mode = PomodoroMode.longPause;
       p.secRemaining = 1;
       p.start();
@@ -101,6 +101,30 @@ void main() {
       p.tick();
       expect(p.mode, equals(PomodoroMode.focus));
       expect(p.cycleCount, equals(2));
+    });
+    test('tick() não deve decrementar secRemaining abaixo de 0', () {
+      p.secRemaining = 0;
+      p.start();
+      p.tick();
+      expect(p.secRemaining, equals(0));
+    });
+    test('tick() decrementa corretamente em múltiplas chamadas', () {
+      p.start();
+      p.tick();
+      p.tick();
+      p.tick();
+      expect(p.secRemaining, equals(1497));
+    });
+    test('start() é idempotente', () {
+      p.start();
+      p.start();
+      expect(p.isRunning, isTrue);
+    });
+    test('pause() é idempotente', () {
+      p.start();
+      p.pause();
+      p.pause();
+      expect(p.isRunning, isFalse);
     });
   });
 }
