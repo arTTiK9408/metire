@@ -1,9 +1,6 @@
 import 'package:test/test.dart';
 import 'package:metire/src/models/pomodoro.dart';
 
-// commit 11c23cf - pinguino app
-// https://github.com/minhosong88/flutter_Pomodoro_app/blob/main/lib/screens/home_screen.dart
-
 void main() {
   group('pomodoro -', () {
     late Pomodoro p;
