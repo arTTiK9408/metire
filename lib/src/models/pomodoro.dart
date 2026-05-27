@@ -13,4 +13,30 @@ class Pomodoro {
   void pause() {
     isRunning = false;
   }
+
+  void tick() {
+    if (!isRunning) return;
+    secRemaining--;
+    if (secRemaining <= 0) {
+      _handleCycleEnd();
+    }
+  }
+
+  void _handleCycleEnd() {
+    isRunning = false;
+    if (mode == PomodoroMode.focus) {
+      cycleCount++;
+      if (cycleCount >= 4) {
+        mode = PomodoroMode.longPause;
+        secRemaining = 900;
+        cycleCount = 0;
+      } else {
+        mode = PomodoroMode.shortPause;
+        secRemaining = 300;
+      }
+    } else {
+      mode = PomodoroMode.focus;
+      secRemaining = 1500;
+    }
+  }
 }
