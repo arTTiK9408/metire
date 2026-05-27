@@ -2,7 +2,7 @@ import 'package:test/test.dart';
 import 'package:metire/src/models/session.dart';
 
 void main() {
-  group('session -', () {
+  group('Session -', () {
     late Session s;
     setUp(() {
       s = Session(name: 'estudo');

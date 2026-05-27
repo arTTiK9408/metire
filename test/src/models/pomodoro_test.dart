@@ -2,7 +2,7 @@ import 'package:test/test.dart';
 import 'package:metire/src/models/pomodoro.dart';
 
 void main() {
-  group('pomodoro -', () {
+  group('Pomodoro -', () {
     late Pomodoro p;
     setUp(() {
       p = Pomodoro();
