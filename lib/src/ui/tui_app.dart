@@ -16,6 +16,11 @@ class _TuiAppState extends State<TuiApp> {
   late final PomodoroService svc;
   Timer? _timer;
   bool _isRenaming = false;
+  final _renameController = TextEditingController();
+
+  static const _sidebarBg = Color(0xFF252526);
+  static const _mainBg = Color(0xFF1E1E1E);
+  static const _inputBg = Color(0xFF3C3C3C);
 
   @override
   void initState() {
@@ -36,6 +41,7 @@ class _TuiAppState extends State<TuiApp> {
   @override
   void dispose() {
     _timer?.cancel();
+    _renameController.dispose();
     super.dispose();
   }
 
@@ -56,11 +62,19 @@ class _TuiAppState extends State<TuiApp> {
   }
 
   void _handleKey(LogicalKey key) {
+    if (_isRenaming) {
+      if (key == LogicalKey.escape) {
+        _isRenaming = false;
+        setState(() {});
+      }
+      return;
+    }
     if (key == LogicalKey.space) {
       svc.toggle();
     } else if (key == LogicalKey.keyR) {
       svc.restart();
     } else if (key == LogicalKey.keyS) {
+      _renameController.text = svc.sessionName;
       _isRenaming = true;
     } else if (key == LogicalKey.keyQ) {
       _shutdown();
@@ -74,57 +88,22 @@ class _TuiAppState extends State<TuiApp> {
     return '$m:$sec';
   }
 
-  Component _buildRenameDialog() {
-    return KeyboardListener(
-      autofocus: true,
-      onKeyEvent: (key) {
-        if (key == LogicalKey.escape) {
-          _isRenaming = false;
-          setState(() {});
-          return true;
-        }
-        return false;
-      },
-      child: Center(
-        child: Container(
-          width: 50,
-          padding: const EdgeInsets.all(4),
-          decoration: BoxDecoration(border: BoxBorder.all()),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Text('Novo nome da sessão:'),
-              const SizedBox(height: 1),
-              TextField(
-                focused: true,
-                onSubmitted: (value) {
-                  svc.renameSession(value);
-                  _isRenaming = false;
-                  setState(() {});
-                },
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+  String get _pauseLabel {
+    if (svc.mode == PomodoroMode.focus) {
+      return svc.cycleCount < 3 ? '(S)' : '(L)';
+    }
+    return svc.mode == PomodoroMode.shortPause ? '(S)' : '(L)';
   }
 
   @override
   Component build(BuildContext context) {
-    if (_isRenaming) return _buildRenameDialog();
-
     final cor = switch (svc.mode) {
       PomodoroMode.focus => Colors.green,
       PomodoroMode.shortPause => Colors.yellow,
       PomodoroMode.longPause => Colors.blue,
     };
 
-    final rotulo = switch (svc.mode) {
-      PomodoroMode.focus => 'FOCUS',
-      PomodoroMode.shortPause => 'SHORT PAUSE',
-      PomodoroMode.longPause => 'LONG PAUSE',
-    };
+    final isFocus = svc.mode == PomodoroMode.focus;
 
     return KeyboardListener(
       autofocus: true,
@@ -133,45 +112,108 @@ class _TuiAppState extends State<TuiApp> {
         return true;
       },
       child: Container(
-        padding: const EdgeInsets.all(4),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                'POMODORO',
-                style: TextStyle(
-                  color: Colors.cyan,
-                  fontWeight: FontWeight.bold,
+        color: _mainBg,
+        child: Row(
+          children: [
+            Expanded(
+              flex: 1,
+              child: Container(
+                color: _sidebarBg,
+                padding: const EdgeInsets.all(4),
+                child: Column(
+                  children: [
+                    const SizedBox(height: 4),
+                    const Text(
+                      'POMODORO',
+                      style: TextStyle(
+                        color: Colors.cyan,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 1),
+                    if (_isRenaming)
+                      TextField(
+                        controller: _renameController,
+                        focused: true,
+                        onSubmitted: (value) {
+                          svc.renameSession(value);
+                          _isRenaming = false;
+                          setState(() {});
+                        },
+                      )
+                    else
+                      Text(
+                        svc.sessionName,
+                        style: const TextStyle(color: Colors.grey),
+                      ),
+                    const Spacer(),
+                    Text(
+                      'Ciclo ${svc.cycleCount + 1}/4',
+                      style: const TextStyle(color: Colors.grey),
+                    ),
+                    Text(
+                      'Focos: ${svc.focusCount}',
+                      style: const TextStyle(color: Colors.grey),
+                    ),
+                    const Spacer(),
+                    const Text(
+                      'v0.1.0',
+                      style: TextStyle(color: Colors.grey),
+                    ),
+                    const SizedBox(height: 4),
+                  ],
                 ),
               ),
-              Text(svc.sessionName, style: TextStyle(color: Colors.grey)),
-              const SizedBox(height: 2),
-              Text(
-                _formatTime(svc.remaining),
-                style: TextStyle(color: cor, fontWeight: FontWeight.bold),
               ),
-              const SizedBox(height: 1),
-              Text(
-                '${svc.isRunning ? "⏵" : "⏸"} $rotulo',
-                style: TextStyle(color: cor),
-              ),
-              const SizedBox(height: 2),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+            ),
+            Expanded(
+              flex: 3,
+              child: Column(
                 children: [
-                  Text('Ciclo ${svc.cycleCount + 1}/4'),
-                  const Text('  │  '),
-                  Text('Focos: ${svc.focusCount}'),
+                  const Spacer(),
+                  Text(
+                    _formatTime(svc.remaining),
+                    style: TextStyle(
+                      color: cor,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        '${isFocus ? "◉" : "○"} FOCUS',
+                        style: TextStyle(
+                          color: isFocus ? cor : Color(0xFF555555),
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        '${!isFocus ? "◉" : "○"} PAUSE $_pauseLabel',
+                        style: TextStyle(
+                          color: !isFocus ? cor : Color(0xFF555555),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const Spacer(),
+                  Container(
+                    margin: const EdgeInsets.only(
+                      left: 8, right: 8, bottom: 4,
+                    ),
+                    padding: const EdgeInsets.all(4),
+                    color: _inputBg,
+                    child: const Text(
+                      'Espaço: Iniciar  R: Reset  S: Renomear  Q: Sair',
+                      style: TextStyle(color: Colors.grey),
+                    ),
+                  ),
+                  const SizedBox(height: 4),
                 ],
               ),
-              const SizedBox(height: 2),
-              Text(
-                '[ Espaço: Iniciar  R: Reset  S: Renomear  Q: Sair ]',
-                style: TextStyle(color: Colors.grey),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
