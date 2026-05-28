@@ -18,15 +18,16 @@ class _TuiAppState extends State<TuiApp> {
   bool _isRenaming = false;
   final _renameController = TextEditingController();
 
-  static const _sidebarBg = Color(0xFF252526);
-  static const _mainBg = Color(0xFF1E1E1E);
-  static const _inputBg = Color(0xFF3C3C3C);
+  static const _mainBg = Color(0x1f2335);
+  static const _secondaryBg = Color(0x292e42);
+  static const _thirdBg = Color(0x414868);
+  static const _blueFg = Color(0x7aa2f7);
 
   @override
   void initState() {
     svc = PomodoroService(
       pomodoro: Pomodoro(),
-      session: Session(name: 'Sessão'),
+      session: Session(name: 'Unnamed Session'),
     );
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (!mounted) {
@@ -118,49 +119,66 @@ class _TuiAppState extends State<TuiApp> {
             Expanded(
               flex: 1,
               child: Container(
-                color: _sidebarBg,
-                padding: const EdgeInsets.all(4),
+                color: _secondaryBg,
                 child: Column(
                   children: [
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 1),
                     const Text(
-                      'POMODORO',
+                      'METIRE TUI',
                       style: TextStyle(
-                        color: Colors.cyan,
+                        color: _blueFg,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     const SizedBox(height: 1),
-                    if (_isRenaming)
-                      TextField(
-                        controller: _renameController,
-                        focused: true,
-                        onSubmitted: (value) {
-                          svc.renameSession(value);
-                          _isRenaming = false;
-                          setState(() {});
-                        },
-                      )
-                    else
-                      Text(
-                        svc.sessionName,
-                        style: const TextStyle(color: Colors.grey),
+                    Container(
+                      child: Column(
+                        children: [
+                          if (_isRenaming)
+                            TextField(
+                              controller: _renameController,
+                              focused: true,
+                              onSubmitted: (value) {
+                                svc.renameSession(value);
+                                _isRenaming = false;
+                                setState(() {});
+                              },
+                            )
+                          else
+                            Text(
+                              svc.sessionName,
+                              style: const TextStyle(color: Colors.white),
+                            ),
+                          const SizedBox(height: 1),
+                          Text(
+                            'Ciclo ${svc.cycleCount + 1}/4',
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                          Text(
+                            'Focos: ${svc.focusCount}',
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                        ],
                       ),
+                      color: _thirdBg,
+                      padding: EdgeInsets.only(
+                        left: 2,
+                        right: 2,
+                        top: 1,
+                        bottom: 1,
+                      ),
+                    ),
+                    const SizedBox(height: 1),
+                    Container(
+                      padding: EdgeInsets.only(left: 1, right: 1),
+                      child: const Divider(
+                        color: _mainBg,
+                        style: DividerStyle.bold,
+                      ),
+                    ),
                     const Spacer(),
-                    Text(
-                      'Ciclo ${svc.cycleCount + 1}/4',
-                      style: const TextStyle(color: Colors.grey),
-                    ),
-                    Text(
-                      'Focos: ${svc.focusCount}',
-                      style: const TextStyle(color: Colors.grey),
-                    ),
-                    const Spacer(),
-                    const Text(
-                      'v0.1.0',
-                      style: TextStyle(color: Colors.grey),
-                    ),
-                    const SizedBox(height: 4),
+                    const Text('v0.1.0', style: TextStyle(color: Colors.grey)),
+                    const SizedBox(height: 1),
                   ],
                 ),
               ),
@@ -172,10 +190,7 @@ class _TuiAppState extends State<TuiApp> {
                   const Spacer(),
                   Text(
                     _formatTime(svc.remaining),
-                    style: TextStyle(
-                      color: cor,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(color: cor, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 2),
                   Row(
@@ -198,17 +213,19 @@ class _TuiAppState extends State<TuiApp> {
                   ),
                   const Spacer(),
                   Container(
-                    margin: const EdgeInsets.only(
-                      left: 8, right: 8, bottom: 4,
+                    padding: const EdgeInsets.only(
+                      left: 4,
+                      right: 4,
+                      top: 1,
+                      bottom: 1,
                     ),
-                    padding: const EdgeInsets.all(4),
-                    color: _inputBg,
+                    color: _secondaryBg,
                     child: const Text(
                       'Espaço: Iniciar  R: Reset  S: Renomear  Q: Sair',
                       style: TextStyle(color: Colors.grey),
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 1),
                 ],
               ),
             ),
