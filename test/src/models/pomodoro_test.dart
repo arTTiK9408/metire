@@ -44,6 +44,17 @@ void main() {
         p.pause();
         expect(p.isRunning, isFalse);
       });
+      test('reset() retorna ao estado inicial', () {
+        p.start();
+        p.secRemaining = 300;
+        p.mode = PomodoroMode.shortPause;
+        p.cycleCount = 2;
+        p.reset();
+        expect(p.isRunning, isFalse);
+        expect(p.secRemaining, equals(1500));
+        expect(p.mode, equals(PomodoroMode.focus));
+        expect(p.cycleCount, equals(0));
+      });
     });
 
     group('tick -', () {
