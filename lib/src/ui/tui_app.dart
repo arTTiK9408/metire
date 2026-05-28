@@ -19,9 +19,19 @@ class _TuiAppState extends State<TuiApp> {
   final _renameController = TextEditingController();
 
   static const _mainBg = Color(0x1f2335);
-  static const _secondaryBg = Color(0x292e42);
-  static const _thirdBg = Color(0x414868);
+  static const _altBg = Color(0x292e42);
   static const _blueFg = Color(0x7aa2f7);
+  static const _w = TextStyle(color: Colors.white);
+  static const _g = TextStyle(color: Colors.grey);
+  static const _dim = TextStyle(color: Color(0xFF555555));
+  static const _gap = SizedBox(height: 1);
+  static const _infoPad = EdgeInsets.only(left: 2, right: 2, top: 1, bottom: 1);
+  static const _shortcutPad = EdgeInsets.only(
+    left: 4,
+    right: 4,
+    top: 1,
+    bottom: 1,
+  );
 
   @override
   void initState() {
@@ -96,6 +106,64 @@ class _TuiAppState extends State<TuiApp> {
     return svc.mode == PomodoroMode.shortPause ? '(S)' : '(L)';
   }
 
+  Component _buildModeRow(Color cor, bool isFocus) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          '${isFocus ? "◉" : "○"} FOCUS',
+          style: TextStyle(color: isFocus ? cor : _dim.color),
+        ),
+        const SizedBox(width: 4),
+        Text(
+          '${!isFocus ? "◉" : "○"} PAUSE $_pauseLabel',
+          style: TextStyle(color: !isFocus ? cor : _dim.color),
+        ),
+      ],
+    );
+  }
+
+  Component _buildInfoPanel() {
+    return Container(
+      margin: const EdgeInsets.only(left: 1, right: 1),
+      color: _mainBg,
+      padding: _infoPad,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          SizedBox(
+            height: 3,
+            child: Align(
+              alignment: Alignment.topLeft,
+              child: _isRenaming
+                  ? TextField(
+                      controller: _renameController,
+                      focused: true,
+                      height: 1,
+                      onKeyEvent: (event) {
+                        if (event.logicalKey == LogicalKey.escape) {
+                          _isRenaming = false;
+                          setState(() {});
+                          return true;
+                        }
+                        return false;
+                      },
+                      onSubmitted: (value) {
+                        svc.renameSession(value);
+                        _isRenaming = false;
+                        setState(() {});
+                      },
+                    )
+                  : Text(svc.sessionName, style: _w),
+            ),
+          ),
+          Text('Ciclo ${svc.cycleCount + 1}/4', style: _w),
+          Text('Focos: ${svc.focusCount}', style: _w),
+        ],
+      ),
+    );
+  }
+
   @override
   Component build(BuildContext context) {
     final cor = switch (svc.mode) {
@@ -119,10 +187,10 @@ class _TuiAppState extends State<TuiApp> {
             Expanded(
               flex: 1,
               child: Container(
-                color: _secondaryBg,
+                color: _altBg,
                 child: Column(
                   children: [
-                    const SizedBox(height: 1),
+                    _gap,
                     const Text(
                       'METIRE TUI',
                       style: TextStyle(
@@ -130,55 +198,11 @@ class _TuiAppState extends State<TuiApp> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(height: 1),
-                    Container(
-                      child: Column(
-                        children: [
-                          if (_isRenaming)
-                            TextField(
-                              controller: _renameController,
-                              focused: true,
-                              onSubmitted: (value) {
-                                svc.renameSession(value);
-                                _isRenaming = false;
-                                setState(() {});
-                              },
-                            )
-                          else
-                            Text(
-                              svc.sessionName,
-                              style: const TextStyle(color: Colors.white),
-                            ),
-                          const SizedBox(height: 1),
-                          Text(
-                            'Ciclo ${svc.cycleCount + 1}/4',
-                            style: const TextStyle(color: Colors.white),
-                          ),
-                          Text(
-                            'Focos: ${svc.focusCount}',
-                            style: const TextStyle(color: Colors.white),
-                          ),
-                        ],
-                      ),
-                      color: _thirdBg,
-                      padding: EdgeInsets.only(
-                        left: 2,
-                        right: 2,
-                        top: 1,
-                        bottom: 1,
-                      ),
-                    ),
-                    const SizedBox(height: 1),
-                    Container(
-                      padding: EdgeInsets.only(left: 1, right: 1),
-                      child: const Divider(
-                        color: _mainBg,
-                        style: DividerStyle.bold,
-                      ),
-                    ),
+                    _gap,
+                    _buildInfoPanel(),
                     const Spacer(),
-                    const Text('v0.1.0', style: TextStyle(color: Colors.grey)),
-                    const SizedBox(height: 1),
+                    const Text('v0.1.0', style: _g),
+                    _gap,
                   ],
                 ),
               ),
@@ -192,43 +216,40 @@ class _TuiAppState extends State<TuiApp> {
                     _formatTime(svc.remaining),
                     style: TextStyle(color: cor, fontWeight: FontWeight.bold),
                   ),
-                  const SizedBox(height: 2),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        '${isFocus ? "◉" : "○"} FOCUS',
-                        style: TextStyle(
-                          color: isFocus ? cor : Color(0xFF555555),
-                        ),
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        '${!isFocus ? "◉" : "○"} PAUSE $_pauseLabel',
-                        style: TextStyle(
-                          color: !isFocus ? cor : Color(0xFF555555),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const Spacer(),
-                  Container(
-                    padding: const EdgeInsets.only(
-                      left: 4,
-                      right: 4,
-                      top: 1,
-                      bottom: 1,
-                    ),
-                    color: _secondaryBg,
-                    child: const Text(
-                      'Espaço: Iniciar  R: Reset  S: Renomear  Q: Sair',
-                      style: TextStyle(color: Colors.grey),
-                    ),
-                  ),
                   const SizedBox(height: 1),
+                  _buildModeRow(cor, isFocus),
+                  const Spacer(),
+                  const _ShortcutBar(),
+                  _gap,
                 ],
               ),
             ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ShortcutBar extends StatelessComponent {
+  const _ShortcutBar();
+
+  @override
+  Component build(BuildContext context) {
+    return Container(
+      padding: _TuiAppState._shortcutPad,
+      color: _TuiAppState._altBg,
+      child: RichText(
+        text: TextSpan(
+          children: [
+            TextSpan(text: 'Espaço', style: _TuiAppState._w),
+            TextSpan(text: ': Iniciar  ', style: _TuiAppState._g),
+            TextSpan(text: 'R', style: _TuiAppState._w),
+            TextSpan(text: ': Reset  ', style: _TuiAppState._g),
+            TextSpan(text: 'S', style: _TuiAppState._w),
+            TextSpan(text: ': Renomear  ', style: _TuiAppState._g),
+            TextSpan(text: 'Q', style: _TuiAppState._w),
+            TextSpan(text: ': Sair', style: _TuiAppState._g),
           ],
         ),
       ),
