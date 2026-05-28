@@ -26,7 +26,7 @@ class _TuiAppState extends State<TuiApp> {
   void initState() {
     svc = PomodoroService(
       pomodoro: Pomodoro(),
-      session: Session(name: 'Unnamed Session'),
+      session: Session(name: 'Sessão'),
     );
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (!mounted) {
@@ -163,7 +163,6 @@ class _TuiAppState extends State<TuiApp> {
                     const SizedBox(height: 4),
                   ],
                 ),
-              ),
               ),
             ),
             Expanded(
