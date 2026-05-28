@@ -1,0 +1,132 @@
+import 'dart:async';
+import 'dart:io' show stdout, stdin, exit, Process;
+import 'package:nocterm/nocterm.dart';
+import 'package:metire/src/services/pomodoro_service.dart';
+import 'package:metire/src/models/pomodoro.dart';
+import 'package:metire/src/models/session.dart';
+
+class TuiApp extends StatefulComponent {
+  const TuiApp({super.key});
+
+  @override
+  State<TuiApp> createState() => _TuiAppState();
+}
+
+class _TuiAppState extends State<TuiApp> {
+  late final PomodoroService svc;
+  Timer? _timer;
+
+  @override
+  void initState() {
+    svc = PomodoroService(
+      pomodoro: Pomodoro(),
+      session: Session(name: 'Sessão'),
+    );
+    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (!mounted) {
+        _timer?.cancel();
+        return;
+      }
+      if (svc.isRunning) svc.tick();
+      setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  void _shutdown() {
+    _timer?.cancel();
+    stdout.write('\x1b[?25h\x1b[?1049l');
+    stdout.flush();
+    stdin
+      ..echoMode = true
+      ..lineMode = true;
+    Process.runSync('stty', ['sane']);
+    exit(0);
+  }
+
+  void _handleKey(LogicalKey key) {
+    if (key == LogicalKey.space) {
+      svc.toggle();
+    } else if (key == LogicalKey.keyR) {
+      svc.restart();
+    } else if (key == LogicalKey.keyQ) {
+      _shutdown();
+    }
+    setState(() {});
+  }
+
+  String _formatTime(int s) {
+    final m = (s ~/ 60).toString().padLeft(2, '0');
+    final sec = (s % 60).toString().padLeft(2, '0');
+    return '$m:$sec';
+  }
+
+  @override
+  Component build(BuildContext context) {
+    final cor = switch (svc.mode) {
+      PomodoroMode.focus => Colors.green,
+      PomodoroMode.shortPause => Colors.yellow,
+      PomodoroMode.longPause => Colors.blue,
+    };
+
+    final rotulo = switch (svc.mode) {
+      PomodoroMode.focus => 'FOCUS',
+      PomodoroMode.shortPause => 'SHORT PAUSE',
+      PomodoroMode.longPause => 'LONG PAUSE',
+    };
+
+    return KeyboardListener(
+      autofocus: true,
+      onKeyEvent: (key) {
+        _handleKey(key);
+        return true;
+      },
+      child: Container(
+        padding: const EdgeInsets.all(4),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                'POMODORO',
+                style: TextStyle(
+                  color: Colors.cyan,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                _formatTime(svc.remaining),
+                style: TextStyle(color: cor, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 1),
+              Text(
+                '${svc.isRunning ? "⏵" : "⏸"} $rotulo',
+                style: TextStyle(color: cor),
+              ),
+              const SizedBox(height: 2),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('Ciclo ${svc.cycleCount + 1}/4'),
+                  const Text('  │  '),
+                  Text('Focos: ${svc.focusCount}'),
+                ],
+              ),
+              const SizedBox(height: 2),
+              Text(
+                '[ Espaço: Iniciar  R: Reset  Q: Sair ]',
+                style: TextStyle(color: Colors.grey),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
