@@ -21,7 +21,7 @@ class _TuiAppState extends State<TuiApp> {
   void initState() {
     svc = PomodoroService(
       pomodoro: Pomodoro(),
-      session: Session(name: 'Sessão'),
+      session: Session(name: 'Unnamed Session'),
     );
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (!mounted) {
@@ -41,8 +41,12 @@ class _TuiAppState extends State<TuiApp> {
 
   void _shutdown() {
     _timer?.cancel();
-    try { stdin.echoMode = true; } catch (_) {}
-    try { stdin.lineMode = true; } catch (_) {}
+    try {
+      stdin.echoMode = true;
+    } catch (_) {}
+    try {
+      stdin.lineMode = true;
+    } catch (_) {}
     try {
       if (Platform.isLinux || Platform.isMacOS) {
         Process.runSync('stty', ['sane']);
@@ -141,10 +145,7 @@ class _TuiAppState extends State<TuiApp> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              Text(
-                svc.sessionName,
-                style: TextStyle(color: Colors.grey),
-              ),
+              Text(svc.sessionName, style: TextStyle(color: Colors.grey)),
               const SizedBox(height: 2),
               Text(
                 _formatTime(svc.remaining),
