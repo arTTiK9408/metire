@@ -19,10 +19,7 @@ class PomodoroService {
   }
 
   void restart() {
-    pomodoro.isRunning = false;
-    pomodoro.secRemaining = 1500;
-    pomodoro.mode = PomodoroMode.focus;
-    pomodoro.cycleCount = 0;
+    pomodoro.reset();
   }
 
   int get remaining => pomodoro.secRemaining;
@@ -33,10 +30,10 @@ class PomodoroService {
   int get pauseCount => session.pauseCount;
 
   void tick() {
-    final modoAnterior = pomodoro.mode;
+    final lastMode = pomodoro.mode;
     pomodoro.tick();
-    if (pomodoro.mode != modoAnterior) {
-      if (modoAnterior == PomodoroMode.focus) {
+    if (pomodoro.mode != lastMode) {
+      if (lastMode == PomodoroMode.focus) {
         session.registerFocus();
       } else {
         session.registerPause();
