@@ -28,6 +28,8 @@ class PomodoroService {
   int get cycleCount => pomodoro.cycleCount;
   int get focusCount => session.focusCount;
   int get pauseCount => session.pauseCount;
+  String get sessionName => session.name;
+  void renameSession(String name) => session.rename(name);
 
   void tick() {
     final lastMode = pomodoro.mode;
