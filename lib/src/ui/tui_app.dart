@@ -15,6 +15,7 @@ class TuiApp extends StatefulComponent {
 class _TuiAppState extends State<TuiApp> {
   late final PomodoroService svc;
   Timer? _timer;
+  bool _isRenaming = false;
 
   @override
   void initState() {
@@ -54,6 +55,8 @@ class _TuiAppState extends State<TuiApp> {
       svc.toggle();
     } else if (key == LogicalKey.keyR) {
       svc.restart();
+    } else if (key == LogicalKey.keyS) {
+      _isRenaming = true;
     } else if (key == LogicalKey.keyQ) {
       _shutdown();
     }
@@ -66,8 +69,46 @@ class _TuiAppState extends State<TuiApp> {
     return '$m:$sec';
   }
 
+  Component _buildRenameDialog() {
+    return KeyboardListener(
+      autofocus: true,
+      onKeyEvent: (key) {
+        if (key == LogicalKey.escape) {
+          _isRenaming = false;
+          setState(() {});
+          return true;
+        }
+        return false;
+      },
+      child: Center(
+        child: Container(
+          width: 50,
+          padding: const EdgeInsets.all(4),
+          decoration: BoxDecoration(border: BoxBorder.all()),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text('Novo nome da sessão:'),
+              const SizedBox(height: 1),
+              TextField(
+                focused: true,
+                onSubmitted: (value) {
+                  svc.renameSession(value);
+                  _isRenaming = false;
+                  setState(() {});
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Component build(BuildContext context) {
+    if (_isRenaming) return _buildRenameDialog();
+
     final cor = switch (svc.mode) {
       PomodoroMode.focus => Colors.green,
       PomodoroMode.shortPause => Colors.yellow,
@@ -99,6 +140,10 @@ class _TuiAppState extends State<TuiApp> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
+              Text(
+                svc.sessionName,
+                style: TextStyle(color: Colors.grey),
+              ),
               const SizedBox(height: 2),
               Text(
                 _formatTime(svc.remaining),
@@ -120,7 +165,7 @@ class _TuiAppState extends State<TuiApp> {
               ),
               const SizedBox(height: 2),
               Text(
-                '[ Espaço: Iniciar  R: Reset  Q: Sair ]',
+                '[ Espaço: Iniciar  R: Reset  S: Renomear  Q: Sair ]',
                 style: TextStyle(color: Colors.grey),
               ),
             ],
