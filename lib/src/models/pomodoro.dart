@@ -14,6 +14,13 @@ class Pomodoro {
     isRunning = false;
   }
 
+  void reset() {
+    isRunning = false;
+    secRemaining = 1500;
+    mode = PomodoroMode.focus;
+    cycleCount = 0;
+  }
+
   void tick() {
     if (!isRunning) return;
     secRemaining--;
