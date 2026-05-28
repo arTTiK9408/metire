@@ -49,6 +49,30 @@ void main() {
         expect(p.mode, equals(PomodoroMode.focus));
         expect(p.cycleCount, equals(0));
       });
+      test('toggle() é idempotente (2x volta ao estado inicial)', () {
+        svc.toggle();
+        svc.toggle();
+        expect(p.isRunning, isFalse);
+      });
+      test('restart() a partir de longPause', () {
+        p.mode = PomodoroMode.longPause;
+        p.secRemaining = 900;
+        p.cycleCount = 0;
+        p.start();
+        svc.restart();
+        expect(p.isRunning, isFalse);
+        expect(p.secRemaining, equals(1500));
+        expect(p.mode, equals(PomodoroMode.focus));
+        expect(p.cycleCount, equals(0));
+      });
+      test('restart() é idempotente quando já resetado', () {
+        svc.restart();
+        svc.restart();
+        expect(p.isRunning, isFalse);
+        expect(p.secRemaining, equals(1500));
+        expect(p.mode, equals(PomodoroMode.focus));
+        expect(p.cycleCount, equals(0));
+      });
     });
 
     group('getters -', () {
@@ -125,6 +149,13 @@ void main() {
         svc.tick();
         expect(s.focusCount, equals(0));
         expect(s.pauseCount, equals(0));
+      });
+      test('tick() com secRemaining=0 executa transição e registra focus', () {
+        p.secRemaining = 0;
+        p.start();
+        svc.tick();
+        expect(p.mode, equals(PomodoroMode.shortPause));
+        expect(s.focusCount, equals(1));
       });
 
       test('após 4 ciclos completos, focusCount é 4', () {
