@@ -7,8 +7,9 @@ void main() {
     await testNocterm('render', (tester) async {
       await tester.pumpComponent(const TuiApp());
 
-      expect(tester.terminalState, containsText('POMODORO'));
-      expect(tester.terminalState, containsText('Sessão'));
+      expect(tester.terminalState, containsText('METIRE TUI'));
+      expect(tester.terminalState, containsText('Unnamed'));
+      expect(tester.terminalState, containsText('Session'));
       expect(tester.terminalState, containsText('25:00'));
       expect(tester.terminalState, containsText('◉ FOCUS'));
       expect(tester.terminalState, containsText('○ PAUSE'));
@@ -56,7 +57,8 @@ void main() {
     await testNocterm('rename', (tester) async {
       await tester.pumpComponent(const TuiApp());
 
-      expect(tester.terminalState, containsText('Sessão'));
+      expect(tester.terminalState, containsText('Unnamed'));
+      expect(tester.terminalState, containsText('Session'));
 
       await tester.sendKey(LogicalKey.keyS);
       await tester.pump();
@@ -64,7 +66,8 @@ void main() {
       await tester.sendKey(LogicalKey.escape);
       await tester.pump();
 
-      expect(tester.terminalState, containsText('Sessão'));
+      expect(tester.terminalState, containsText('Unnamed'));
+      expect(tester.terminalState, containsText('Session'));
     });
   });
 }
