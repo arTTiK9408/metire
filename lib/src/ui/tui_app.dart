@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:io' show stdout, stdin, exit, Process;
+import 'dart:io' show stdin, Process, Platform;
 import 'package:nocterm/nocterm.dart';
 import 'package:metire/src/services/pomodoro_service.dart';
 import 'package:metire/src/models/pomodoro.dart';
@@ -41,13 +41,14 @@ class _TuiAppState extends State<TuiApp> {
 
   void _shutdown() {
     _timer?.cancel();
-    stdout.write('\x1b[?25h\x1b[?1049l');
-    stdout.flush();
-    stdin
-      ..echoMode = true
-      ..lineMode = true;
-    Process.runSync('stty', ['sane']);
-    exit(0);
+    try { stdin.echoMode = true; } catch (_) {}
+    try { stdin.lineMode = true; } catch (_) {}
+    try {
+      if (Platform.isLinux || Platform.isMacOS) {
+        Process.runSync('stty', ['sane']);
+      }
+    } catch (_) {}
+    shutdownApp();
   }
 
   void _handleKey(LogicalKey key) {
