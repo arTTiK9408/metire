@@ -35,6 +35,10 @@ void main() {
         s.rename('');
         expect(s.name, equals('Unnamed Session'));
       });
+      test('rename() com apenas espaços usa nome padrão "Unnamed Session"', () {
+        s.rename('   ');
+        expect(s.name, equals('Unnamed Session'));
+      });
     });
 
     group('contadores -', () {
