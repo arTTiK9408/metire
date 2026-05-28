@@ -73,6 +73,17 @@ void main() {
         expect(p.mode, equals(PomodoroMode.focus));
         expect(p.cycleCount, equals(0));
       });
+      test('renameSession() altera o nome da sessão', () {
+        svc.renameSession('trabalho');
+        expect(s.name, equals('trabalho'));
+      });
+      test('renameSession() com nome vazio usa "Unnamed Session"', () {
+        svc.renameSession('');
+        expect(s.name, equals('Unnamed Session'));
+      });
+      test('sessionName retorna o nome da sessão', () {
+        expect(svc.sessionName, equals('teste'));
+      });
     });
 
     group('getters -', () {
