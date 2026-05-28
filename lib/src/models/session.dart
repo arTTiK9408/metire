@@ -9,7 +9,7 @@ class Session {
       : startTime = DateTime.now();
 
   void rename(String newName) {
-    name = newName.isEmpty ? 'Unnamed Session' : newName;
+    name = newName.trim().isEmpty ? 'Unnamed Session' : newName;
   }
 
   void registerFocus() {
