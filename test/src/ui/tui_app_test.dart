@@ -10,6 +10,7 @@ void main() {
       expect(tester.terminalState, containsText('POMODORO'));
       expect(tester.terminalState, containsText('25:00'));
       expect(tester.terminalState, containsText('FOCUS'));
+      expect(tester.terminalState, containsText('Sessão'));
       expect(tester.terminalState, containsText('Q: Sair'));
     });
   });
@@ -44,6 +45,24 @@ void main() {
 
       expect(tester.terminalState, containsText('25:00'));
       expect(tester.terminalState, containsText('⏸'));
+    });
+  });
+
+  test('TuiApp - s abre diálogo de rename e esc sai sem alterar', () async {
+    await testNocterm('rename', (tester) async {
+      await tester.pumpComponent(const TuiApp());
+
+      expect(tester.terminalState, containsText('Sessão'));
+
+      await tester.sendKey(LogicalKey.keyS);
+      await tester.pump();
+
+      expect(tester.terminalState, containsText('Novo nome'));
+
+      await tester.sendKey(LogicalKey.escape);
+      await tester.pump();
+
+      expect(tester.terminalState, containsText('Sessão'));
     });
   });
 }
