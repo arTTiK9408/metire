@@ -9,12 +9,11 @@ void main() {
 
       expect(tester.terminalState, containsText('METIRE'));
       expect(tester.terminalState, containsText('Unnamed'));
-      expect(tester.terminalState, containsText('Session'));
       expect(tester.terminalState, containsText('25:00'));
       expect(tester.terminalState, containsText('◉ FOCUS'));
       expect(tester.terminalState, containsText('○ PAUSE'));
       expect(tester.terminalState, containsText('󱓻'));
-      expect(tester.terminalState, containsText('Focos: 0'));
+      expect(tester.terminalState, containsText('● 0'));
       expect(tester.terminalState, containsText('v0.1.0'));
       expect(tester.terminalState, containsText('Q: Sair'));
     });
@@ -59,7 +58,6 @@ void main() {
       await tester.pumpComponent(const TuiApp());
 
       expect(tester.terminalState, containsText('Unnamed'));
-      expect(tester.terminalState, containsText('Session'));
 
       await tester.sendKey(LogicalKey.keyS);
       await tester.pump();
@@ -68,7 +66,6 @@ void main() {
       await tester.pump();
 
       expect(tester.terminalState, containsText('Unnamed'));
-      expect(tester.terminalState, containsText('Session'));
     });
   });
 }

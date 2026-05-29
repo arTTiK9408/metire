@@ -1,9 +1,10 @@
 import 'dart:async';
 import 'dart:io' show stdin, Process, Platform;
-import 'package:nocterm/nocterm.dart';
-import 'package:metire/src/services/pomodoro_service.dart';
+
 import 'package:metire/src/models/pomodoro.dart';
 import 'package:metire/src/models/session.dart';
+import 'package:metire/src/services/pomodoro_service.dart';
+import 'package:nocterm/nocterm.dart';
 
 class TuiApp extends StatefulComponent {
   const TuiApp({super.key});
@@ -12,173 +13,59 @@ class TuiApp extends StatefulComponent {
   State<TuiApp> createState() => _TuiAppState();
 }
 
-class _TuiAppState extends State<TuiApp> {
-  late final PomodoroService svc;
-  Timer? _timer;
-  bool _isRenaming = false;
-  final _renameController = TextEditingController();
+class _ShortcutBar extends StatelessComponent {
+  const _ShortcutBar({required this.isRunning});
+  final bool isRunning;
 
+  @override
+  Component build(BuildContext context) {
+    return Container(
+      padding: _TuiAppState._keysPad,
+      color: _TuiAppState._altBg,
+      child: RichText(
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        text: TextSpan(
+          children: [
+            TextSpan(text: 'Espaço', style: _TuiAppState._w),
+            TextSpan(
+              text: isRunning ? ' Pausar  ' : ' Iniciar  ',
+              style: _TuiAppState._g,
+            ),
+            TextSpan(text: 'R', style: _TuiAppState._w),
+            TextSpan(text: ' Reset  ', style: _TuiAppState._g),
+            TextSpan(text: 'S', style: _TuiAppState._w),
+            TextSpan(text: ' Renomear  ', style: _TuiAppState._g),
+            TextSpan(text: 'Q', style: _TuiAppState._w),
+            TextSpan(text: ' Sair', style: _TuiAppState._g),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _TuiAppState extends State<TuiApp> {
   static const _mainBg = Color(0x1f2335);
   static const _altBg = Color(0x292e42);
   static const _blueFg = Color(0x7aa2f7);
   static const _w = TextStyle(color: Colors.white);
+
   static const _g = TextStyle(color: Colors.grey);
   static const _dim = TextStyle(color: Color(0xFF555555));
   static const _gap = SizedBox(height: 1);
   static const _infoPad = EdgeInsets.only(left: 2, right: 2, top: 1, bottom: 1);
-  static const _shortcutPad = EdgeInsets.only(
-    left: 4,
-    right: 4,
-    top: 1,
-    bottom: 1,
-  );
-
-  @override
-  void initState() {
-    svc = PomodoroService(
-      pomodoro: Pomodoro(),
-      session: Session(name: 'Unnamed Session'),
-    );
-    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
-      if (!mounted) {
-        _timer?.cancel();
-        return;
-      }
-      if (svc.isRunning) svc.tick();
-      setState(() {});
-    });
-  }
-
-  @override
-  void dispose() {
-    _timer?.cancel();
-    _renameController.dispose();
-    super.dispose();
-  }
-
-  void _shutdown() {
-    _timer?.cancel();
-    try {
-      stdin.echoMode = true;
-    } catch (_) {}
-    try {
-      stdin.lineMode = true;
-    } catch (_) {}
-    try {
-      if (Platform.isLinux || Platform.isMacOS) {
-        Process.runSync('stty', ['sane']);
-      }
-    } catch (_) {}
-    shutdownApp();
-  }
-
-  void _handleKey(LogicalKey key) {
-    if (_isRenaming) {
-      if (key == LogicalKey.escape) {
-        _isRenaming = false;
-        setState(() {});
-      }
-      return;
-    }
-    if (key == LogicalKey.space) {
-      svc.toggle();
-    } else if (key == LogicalKey.keyR) {
-      svc.restart();
-    } else if (key == LogicalKey.keyS) {
-      _renameController.text = svc.sessionName;
-      _isRenaming = true;
-    } else if (key == LogicalKey.keyQ) {
-      _shutdown();
-    }
-    setState(() {});
-  }
-
-  String _formatTime(int s) {
-    final m = (s ~/ 60).toString().padLeft(2, '0');
-    final sec = (s % 60).toString().padLeft(2, '0');
-    return '$m:$sec';
-  }
+  static const _keysPad = EdgeInsets.only(left: 4, right: 4, top: 1, bottom: 1);
+  late final PomodoroService svc;
+  Timer? _timer;
+  bool _isRenaming = false;
+  final _renameController = TextEditingController();
 
   String get _pauseLabel {
     if (svc.mode == PomodoroMode.focus) {
       return svc.cycleCount < 3 ? '(S)' : '(L)';
     }
     return svc.mode == PomodoroMode.shortPause ? '(S)' : '(L)';
-  }
-
-  Component _buildModeRow(Color cor, bool isFocus) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Text(
-          '${isFocus ? "◉" : "○"} FOCUS',
-          style: TextStyle(color: isFocus ? cor : _dim.color),
-        ),
-        const SizedBox(width: 4),
-        Text(
-          '${!isFocus ? "◉" : "○"} PAUSE $_pauseLabel',
-          style: TextStyle(color: !isFocus ? cor : _dim.color),
-        ),
-      ],
-    );
-  }
-
-  Component _buildInfoPanel() {
-    return Container(
-      margin: const EdgeInsets.only(left: 1, right: 1),
-      color: _mainBg,
-      padding: _infoPad,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          SizedBox(
-            height: 3,
-            child: Align(
-              alignment: Alignment.topLeft,
-              child: _isRenaming
-                  ? TextField(
-                      controller: _renameController,
-                      focused: true,
-                      height: 1,
-                      onKeyEvent: (event) {
-                        if (event.logicalKey == LogicalKey.escape) {
-                          _isRenaming = false;
-                          setState(() {});
-                          return true;
-                        }
-                        return false;
-                      },
-                      onSubmitted: (value) {
-                        svc.renameSession(value);
-                        _isRenaming = false;
-                        setState(() {});
-                      },
-                    )
-                  : Text(svc.sessionName, style: _w),
-            ),
-          ),
-          Row(
-            children: [
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: List.generate(4, (i) {
-                  final ativo = i == svc.cycleCount;
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 1),
-                    child: Text(
-                      ativo ? '󱓻' : '󱓼',
-                      style: TextStyle(color: ativo ? Colors.white : Color(0xFF555555)),
-                    ),
-                  );
-                }),
-              ),
-              const Spacer(),
-              Text('Focos: ${svc.focusCount}', style: _w),
-            ],
-          ),
-        ],
-      ),
-    );
   }
 
   @override
@@ -238,11 +125,13 @@ class _TuiAppState extends State<TuiApp> {
                   Text(
                     _formatTime(svc.remaining),
                     style: TextStyle(color: cor, fontWeight: FontWeight.bold),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 1),
                   _buildModeRow(cor, isFocus),
                   const Spacer(),
-                  const _ShortcutBar(),
+                  _ShortcutBar(isRunning: svc.isRunning),
                   _gap,
                 ],
               ),
@@ -252,30 +141,151 @@ class _TuiAppState extends State<TuiApp> {
       ),
     );
   }
-}
-
-class _ShortcutBar extends StatelessComponent {
-  const _ShortcutBar();
 
   @override
-  Component build(BuildContext context) {
+  void dispose() {
+    _timer?.cancel();
+    _renameController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    svc = PomodoroService(
+      pomodoro: Pomodoro(),
+      session: Session(name: 'Unnamed Session'),
+    );
+    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (!mounted) {
+        _timer?.cancel();
+        return;
+      }
+      if (svc.isRunning) svc.tick();
+      setState(() {});
+    });
+  }
+
+  Component _buildInfoPanel() {
     return Container(
-      padding: _TuiAppState._shortcutPad,
-      color: _TuiAppState._altBg,
-      child: RichText(
-        text: TextSpan(
-          children: [
-            TextSpan(text: 'Espaço', style: _TuiAppState._w),
-            TextSpan(text: ': Iniciar  ', style: _TuiAppState._g),
-            TextSpan(text: 'R', style: _TuiAppState._w),
-            TextSpan(text: ': Reset  ', style: _TuiAppState._g),
-            TextSpan(text: 'S', style: _TuiAppState._w),
-            TextSpan(text: ': Renomear  ', style: _TuiAppState._g),
-            TextSpan(text: 'Q', style: _TuiAppState._w),
-            TextSpan(text: ': Sair', style: _TuiAppState._g),
-          ],
-        ),
+      clipBehavior: Clip.hardEdge,
+      margin: const EdgeInsets.only(left: 1, right: 1),
+      color: _mainBg,
+      padding: _infoPad,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _isRenaming
+              ? TextField(
+                  controller: _renameController,
+                  focused: true,
+                  onKeyEvent: (event) {
+                    if (event.logicalKey == LogicalKey.escape) {
+                      _isRenaming = false;
+                      setState(() {});
+                      return true;
+                    }
+                    return false;
+                  },
+                  onSubmitted: (value) {
+                    svc.renameSession(value);
+                    _isRenaming = false;
+                    setState(() {});
+                  },
+                )
+              : Text(svc.sessionName, style: _w, softWrap: true),
+          Row(
+            children: [
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: List.generate(4, (i) {
+                  final ativo = i == svc.cycleCount;
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 1),
+                    child: Text(
+                      ativo ? '󱓻' : '󱓼',
+                      style: TextStyle(
+                        color: ativo ? Colors.white : Color(0xFF555555),
+                      ),
+                    ),
+                  );
+                }),
+              ),
+              const Spacer(),
+              Text(
+                '● ${svc.focusCount}',
+                style: _w,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        ],
       ),
     );
+  }
+
+  Component _buildModeRow(Color cor, bool isFocus) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Container(
+          decoration: isFocus
+              ? BoxDecoration(border: BoxBorder.all(color: cor))
+              : null,
+          padding: const EdgeInsets.all(1),
+          child: Text(
+            '${isFocus ? "◉" : "○"} FOCUS',
+            style: TextStyle(color: isFocus ? cor : _dim.color),
+          ),
+        ),
+        const SizedBox(width: 4),
+        Container(
+          decoration: !isFocus
+              ? BoxDecoration(border: BoxBorder.all(color: cor))
+              : null,
+          padding: const EdgeInsets.all(1),
+          child: Text(
+            '${!isFocus ? "◉" : "○"} PAUSE $_pauseLabel',
+            style: TextStyle(color: !isFocus ? cor : _dim.color),
+          ),
+        ),
+      ],
+    );
+  }
+
+  String _formatTime(int s) {
+    final m = (s ~/ 60).toString().padLeft(2, '0');
+    final sec = (s % 60).toString().padLeft(2, '0');
+    return '$m:$sec';
+  }
+
+  void _handleKey(LogicalKey key) {
+    if (key == LogicalKey.space) {
+      svc.toggle();
+    } else if (key == LogicalKey.keyR) {
+      svc.restart();
+    } else if (key == LogicalKey.keyS) {
+      _renameController.text = svc.sessionName;
+      _isRenaming = true;
+    } else if (key == LogicalKey.keyQ) {
+      _shutdown();
+    }
+    setState(() {});
+  }
+
+  void _shutdown() {
+    _timer?.cancel();
+    try {
+      stdin.echoMode = true;
+    } catch (_) {}
+    try {
+      stdin.lineMode = true;
+    } catch (_) {}
+    try {
+      if (Platform.isLinux || Platform.isMacOS) {
+        Process.runSync('stty', ['sane']);
+      }
+    } catch (_) {}
+    shutdownApp();
   }
 }
