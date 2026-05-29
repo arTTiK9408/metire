@@ -157,8 +157,25 @@ class _TuiAppState extends State<TuiApp> {
                   : Text(svc.sessionName, style: _w),
             ),
           ),
-          Text('Ciclo ${svc.cycleCount + 1}/4', style: _w),
-          Text('Focos: ${svc.focusCount}', style: _w),
+          Row(
+            children: [
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: List.generate(4, (i) {
+                  final ativo = i == svc.cycleCount;
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 1),
+                    child: Text(
+                      ativo ? '󱓻' : '󱓼',
+                      style: TextStyle(color: ativo ? Colors.white : Color(0xFF555555)),
+                    ),
+                  );
+                }),
+              ),
+              const Spacer(),
+              Text('Focos: ${svc.focusCount}', style: _w),
+            ],
+          ),
         ],
       ),
     );
@@ -169,7 +186,7 @@ class _TuiAppState extends State<TuiApp> {
     final cor = switch (svc.mode) {
       PomodoroMode.focus => Colors.green,
       PomodoroMode.shortPause => Colors.yellow,
-      PomodoroMode.longPause => Colors.blue,
+      PomodoroMode.longPause => Colors.red,
     };
 
     final isFocus = svc.mode == PomodoroMode.focus;
@@ -192,7 +209,7 @@ class _TuiAppState extends State<TuiApp> {
                   children: [
                     _gap,
                     const Text(
-                      'METIRE TUI',
+                      'METIRE',
                       style: TextStyle(
                         color: _blueFg,
                         fontWeight: FontWeight.bold,
@@ -201,7 +218,13 @@ class _TuiAppState extends State<TuiApp> {
                     _gap,
                     _buildInfoPanel(),
                     const Spacer(),
-                    const Text('v0.1.0', style: _g),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text('Metire TUI ', style: _w),
+                        const Text('v0.1.0', style: _g),
+                      ],
+                    ),
                     _gap,
                   ],
                 ),
