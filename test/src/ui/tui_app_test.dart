@@ -7,13 +7,14 @@ void main() {
     await testNocterm('render', (tester) async {
       await tester.pumpComponent(const TuiApp());
 
-      expect(tester.terminalState, containsText('METIRE TUI'));
+      expect(tester.terminalState, containsText('METIRE'));
       expect(tester.terminalState, containsText('Unnamed'));
       expect(tester.terminalState, containsText('Session'));
       expect(tester.terminalState, containsText('25:00'));
       expect(tester.terminalState, containsText('◉ FOCUS'));
       expect(tester.terminalState, containsText('○ PAUSE'));
-      expect(tester.terminalState, containsText('Ciclo 1/4'));
+      expect(tester.terminalState, containsText('󱓻'));
+      expect(tester.terminalState, containsText('Focos: 0'));
       expect(tester.terminalState, containsText('v0.1.0'));
       expect(tester.terminalState, containsText('Q: Sair'));
     });
