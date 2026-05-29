@@ -21,6 +21,9 @@ void main() {
       test('mode deve ser focus ao iniciar', () {
         expect(p.mode, equals(PomodoroMode.focus));
       });
+      test('focusCount deve ser 0 ao iniciar', () {
+        expect(p.focusCount, equals(0));
+      });
     });
 
     group('operações -', () {
@@ -89,6 +92,12 @@ void main() {
           p.start();
           p.tick();
           expect(p.isRunning, isFalse);
+        });
+        test('focusCount é incrementado quando focus termina', () {
+          p.secRemaining = 1;
+          p.start();
+          p.tick();
+          expect(p.focusCount, equals(1));
         });
         test(
           'quando focus termina com menos de 4 ciclos → shortPause com 300s',
