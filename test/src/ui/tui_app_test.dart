@@ -3,18 +3,15 @@ import 'package:nocterm/nocterm.dart';
 import 'package:metire/src/ui/tui_app.dart';
 
 void main() {
-  test('TuiApp - renderiza layout com sidebar e área principal', () async {
+  test('TuiApp - renderiza layout simplificado', () async {
     await testNocterm('render', (tester) async {
       await tester.pumpComponent(const TuiApp());
 
-      expect(tester.terminalState, containsText('METIRE'));
-      expect(tester.terminalState, containsText('Unnamed'));
       expect(tester.terminalState, containsText('25:00'));
       expect(tester.terminalState, containsText('◉ FOCUS'));
       expect(tester.terminalState, containsText('○ PAUSE'));
       expect(tester.terminalState, containsText('󱓻'));
       expect(tester.terminalState, containsText('● 0'));
-      expect(tester.terminalState, containsText('v0.1.0'));
       expect(tester.terminalState, containsText('Q: Sair'));
     });
   });
@@ -50,22 +47,6 @@ void main() {
       await tester.pump();
 
       expect(tester.terminalState, containsText('25:00'));
-    });
-  });
-
-  test('TuiApp - s entra em modo rename e esc sai sem alterar', () async {
-    await testNocterm('rename', (tester) async {
-      await tester.pumpComponent(const TuiApp());
-
-      expect(tester.terminalState, containsText('Unnamed'));
-
-      await tester.sendKey(LogicalKey.keyS);
-      await tester.pump();
-
-      await tester.sendKey(LogicalKey.escape);
-      await tester.pump();
-
-      expect(tester.terminalState, containsText('Unnamed'));
     });
   });
 }
