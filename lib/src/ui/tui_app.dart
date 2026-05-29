@@ -2,8 +2,6 @@ import 'dart:async';
 import 'dart:io' show stdin, Process, Platform;
 
 import 'package:metire/src/models/pomodoro.dart';
-import 'package:metire/src/models/session.dart';
-import 'package:metire/src/services/pomodoro_service.dart';
 import 'package:nocterm/nocterm.dart';
 
 class TuiApp extends StatefulComponent {
@@ -29,15 +27,13 @@ class _ShortcutBar extends StatelessComponent {
           children: [
             TextSpan(text: 'Espaço', style: _TuiAppState._w),
             TextSpan(
-              text: isRunning ? ' Pausar  ' : ' Iniciar  ',
+              text: isRunning ? ': Pausar  ' : ': Iniciar  ',
               style: _TuiAppState._g,
             ),
             TextSpan(text: 'R', style: _TuiAppState._w),
-            TextSpan(text: ' Reset  ', style: _TuiAppState._g),
-            TextSpan(text: 'S', style: _TuiAppState._w),
-            TextSpan(text: ' Renomear  ', style: _TuiAppState._g),
+            TextSpan(text: ': Reset  ', style: _TuiAppState._g),
             TextSpan(text: 'Q', style: _TuiAppState._w),
-            TextSpan(text: ' Sair', style: _TuiAppState._g),
+            TextSpan(text: ': Sair', style: _TuiAppState._g),
           ],
         ),
       ),
@@ -48,35 +44,30 @@ class _ShortcutBar extends StatelessComponent {
 class _TuiAppState extends State<TuiApp> {
   static const _mainBg = Color(0x1f2335);
   static const _altBg = Color(0x292e42);
-  static const _blueFg = Color(0x7aa2f7);
   static const _w = TextStyle(color: Colors.white);
-
   static const _g = TextStyle(color: Colors.grey);
   static const _dim = TextStyle(color: Color(0xFF555555));
   static const _gap = SizedBox(height: 1);
-  static const _infoPad = EdgeInsets.only(left: 2, right: 2, top: 1, bottom: 1);
   static const _keysPad = EdgeInsets.only(left: 4, right: 4, top: 1, bottom: 1);
-  late final PomodoroService svc;
+  late final Pomodoro p;
   Timer? _timer;
-  bool _isRenaming = false;
-  final _renameController = TextEditingController();
 
   String get _pauseLabel {
-    if (svc.mode == PomodoroMode.focus) {
-      return svc.cycleCount < 3 ? '(S)' : '(L)';
+    if (p.mode == PomodoroMode.focus) {
+      return p.cycleCount < 3 ? '(S)' : '(L)';
     }
-    return svc.mode == PomodoroMode.shortPause ? '(S)' : '(L)';
+    return p.mode == PomodoroMode.shortPause ? '(S)' : '(L)';
   }
 
   @override
   Component build(BuildContext context) {
-    final cor = switch (svc.mode) {
+    final cor = switch (p.mode) {
       PomodoroMode.focus => Colors.green,
       PomodoroMode.shortPause => Colors.yellow,
       PomodoroMode.longPause => Colors.red,
     };
 
-    final isFocus = svc.mode == PomodoroMode.focus;
+    final isFocus = p.mode == PomodoroMode.focus;
 
     return KeyboardListener(
       autofocus: true,
@@ -86,56 +77,45 @@ class _TuiAppState extends State<TuiApp> {
       },
       child: Container(
         color: _mainBg,
-        child: Row(
+        child: Column(
           children: [
-            Expanded(
-              flex: 1,
-              child: Container(
-                color: _altBg,
-                child: Column(
-                  children: [
-                    _gap,
-                    const Text(
-                      'METIRE',
-                      style: TextStyle(
-                        color: _blueFg,
-                        fontWeight: FontWeight.bold,
+            _gap,
+            Row(
+              children: [
+                const SizedBox(width: 2),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: List.generate(4, (i) {
+                    final ativo = i == p.cycleCount;
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 1),
+                      child: Text(
+                        ativo ? '󱓻' : '󱓼',
+                        style: TextStyle(
+                          color: ativo ? Colors.white : Color(0xFF555555),
+                        ),
                       ),
-                    ),
-                    _gap,
-                    _buildInfoPanel(),
-                    const Spacer(),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Text('Metire TUI ', style: _w),
-                        const Text('v0.1.0', style: _g),
-                      ],
-                    ),
-                    _gap,
-                  ],
+                    );
+                  }),
                 ),
-              ),
+                const Spacer(),
+                Text('● ${p.focusCount}', style: _w, maxLines: 1,
+                    overflow: TextOverflow.ellipsis),
+                const SizedBox(width: 2),
+              ],
             ),
-            Expanded(
-              flex: 3,
-              child: Column(
-                children: [
-                  const Spacer(),
-                  Text(
-                    _formatTime(svc.remaining),
-                    style: TextStyle(color: cor, fontWeight: FontWeight.bold),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 1),
-                  _buildModeRow(cor, isFocus),
-                  const Spacer(),
-                  _ShortcutBar(isRunning: svc.isRunning),
-                  _gap,
-                ],
-              ),
+            const Spacer(),
+            Text(
+              _formatTime(p.secRemaining),
+              style: TextStyle(color: cor, fontWeight: FontWeight.bold),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
+            const SizedBox(height: 1),
+            _buildModeRow(cor, isFocus),
+            const Spacer(),
+            _ShortcutBar(isRunning: p.isRunning),
+            _gap,
           ],
         ),
       ),
@@ -145,109 +125,34 @@ class _TuiAppState extends State<TuiApp> {
   @override
   void dispose() {
     _timer?.cancel();
-    _renameController.dispose();
     super.dispose();
   }
 
   @override
   void initState() {
-    svc = PomodoroService(
-      pomodoro: Pomodoro(),
-      session: Session(name: 'Unnamed Session'),
-    );
+    p = Pomodoro();
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (!mounted) {
         _timer?.cancel();
         return;
       }
-      if (svc.isRunning) svc.tick();
+      if (p.isRunning) p.tick();
       setState(() {});
     });
-  }
-
-  Component _buildInfoPanel() {
-    return Container(
-      clipBehavior: Clip.hardEdge,
-      margin: const EdgeInsets.only(left: 1, right: 1),
-      color: _mainBg,
-      padding: _infoPad,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          _isRenaming
-              ? TextField(
-                  controller: _renameController,
-                  focused: true,
-                  onKeyEvent: (event) {
-                    if (event.logicalKey == LogicalKey.escape) {
-                      _isRenaming = false;
-                      setState(() {});
-                      return true;
-                    }
-                    return false;
-                  },
-                  onSubmitted: (value) {
-                    svc.renameSession(value);
-                    _isRenaming = false;
-                    setState(() {});
-                  },
-                )
-              : Text(svc.sessionName, style: _w, softWrap: true),
-          Row(
-            children: [
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: List.generate(4, (i) {
-                  final ativo = i == svc.cycleCount;
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 1),
-                    child: Text(
-                      ativo ? '󱓻' : '󱓼',
-                      style: TextStyle(
-                        color: ativo ? Colors.white : Color(0xFF555555),
-                      ),
-                    ),
-                  );
-                }),
-              ),
-              const Spacer(),
-              Text(
-                '● ${svc.focusCount}',
-                style: _w,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
   }
 
   Component _buildModeRow(Color cor, bool isFocus) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Container(
-          decoration: isFocus
-              ? BoxDecoration(border: BoxBorder.all(color: cor))
-              : null,
-          padding: const EdgeInsets.all(1),
-          child: Text(
-            '${isFocus ? "◉" : "○"} FOCUS',
-            style: TextStyle(color: isFocus ? cor : _dim.color),
-          ),
+        Text(
+          '${isFocus ? "◉" : "○"} FOCUS',
+          style: TextStyle(color: isFocus ? cor : _dim.color),
         ),
         const SizedBox(width: 4),
-        Container(
-          decoration: !isFocus
-              ? BoxDecoration(border: BoxBorder.all(color: cor))
-              : null,
-          padding: const EdgeInsets.all(1),
-          child: Text(
-            '${!isFocus ? "◉" : "○"} PAUSE $_pauseLabel',
-            style: TextStyle(color: !isFocus ? cor : _dim.color),
-          ),
+        Text(
+          '${!isFocus ? "◉" : "○"} PAUSE $_pauseLabel',
+          style: TextStyle(color: !isFocus ? cor : _dim.color),
         ),
       ],
     );
@@ -261,12 +166,13 @@ class _TuiAppState extends State<TuiApp> {
 
   void _handleKey(LogicalKey key) {
     if (key == LogicalKey.space) {
-      svc.toggle();
+      if (p.isRunning) {
+        p.pause();
+      } else {
+        p.start();
+      }
     } else if (key == LogicalKey.keyR) {
-      svc.restart();
-    } else if (key == LogicalKey.keyS) {
-      _renameController.text = svc.sessionName;
-      _isRenaming = true;
+      p.reset();
     } else if (key == LogicalKey.keyQ) {
       _shutdown();
     }

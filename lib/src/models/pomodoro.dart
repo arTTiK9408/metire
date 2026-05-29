@@ -5,6 +5,7 @@ class Pomodoro {
   bool isRunning = false;
   int secRemaining = 1500;
   int cycleCount = 0;
+  int focusCount = 0;
 
   void start() {
     isRunning = true;
@@ -32,6 +33,7 @@ class Pomodoro {
   void _handleCycleEnd() {
     isRunning = false;
     if (mode == PomodoroMode.focus) {
+      focusCount++;
       cycleCount++;
       if (cycleCount >= 4) {
         mode = PomodoroMode.longPause;
