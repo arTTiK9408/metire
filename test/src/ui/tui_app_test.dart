@@ -7,12 +7,10 @@ void main() {
     await testNocterm('render', (tester) async {
       await tester.pumpComponent(const TuiApp());
 
-      expect(tester.terminalState, containsText('25:00'));
-      expect(tester.terminalState, containsText('◉ FOCUS'));
-      expect(tester.terminalState, containsText('○ PAUSE'));
+      expect(tester.terminalState, containsText('FOCUS (0)'));
+      expect(tester.terminalState, containsText('PAUSE (S)'));
       expect(tester.terminalState, containsText('󱓻'));
-      expect(tester.terminalState, containsText('● 0'));
-      expect(tester.terminalState, containsText('Q: Sair'));
+      expect(tester.terminalState, containsText('Q Sair'));
     });
   });
 
@@ -20,17 +18,17 @@ void main() {
     await testNocterm('space toggle', (tester) async {
       await tester.pumpComponent(const TuiApp());
 
-      expect(tester.terminalState, containsText('◉ FOCUS'));
+      expect(tester.terminalState, containsText('FOCUS (0)'));
 
       await tester.sendKey(LogicalKey.space);
       await tester.pump(const Duration(seconds: 1));
 
-      expect(tester.terminalState, containsText('24:59'));
+      expect(tester.terminalState, containsText('09'));
 
       await tester.sendKey(LogicalKey.space);
       await tester.pump(const Duration(seconds: 1));
 
-      expect(tester.terminalState, containsText('24:59'));
+      expect(tester.terminalState, containsText('09'));
     });
   });
 
@@ -41,12 +39,26 @@ void main() {
       await tester.sendKey(LogicalKey.space);
       await tester.pump(const Duration(seconds: 1));
 
-      expect(tester.terminalState, containsText('24:59'));
+      expect(tester.terminalState, containsText('09'));
 
       await tester.sendKey(LogicalKey.keyR);
       await tester.pump();
 
       expect(tester.terminalState, containsText('25:00'));
+    });
+  });
+
+  test('TuiApp - timer mostra valor atual após pausar', () async {
+    await testNocterm('pause display', (tester) async {
+      await tester.pumpComponent(const TuiApp());
+
+      await tester.sendKey(LogicalKey.space);
+      await tester.pump(const Duration(seconds: 1));
+
+      await tester.sendKey(LogicalKey.space);
+      await tester.pump();
+
+      expect(tester.terminalState, containsText('09'));
     });
   });
 }

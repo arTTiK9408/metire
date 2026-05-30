@@ -3,7 +3,7 @@ enum PomodoroMode { focus, shortPause, longPause }
 class Pomodoro {
   PomodoroMode mode = PomodoroMode.focus;
   bool isRunning = false;
-  int secRemaining = 1500;
+  int secRemaining = 10; // 1500
   int cycleCount = 0;
   int focusCount = 0;
 
@@ -37,15 +37,15 @@ class Pomodoro {
       cycleCount++;
       if (cycleCount >= 4) {
         mode = PomodoroMode.longPause;
-        secRemaining = 900;
+        secRemaining = 9; // 900
         cycleCount = 0;
       } else {
         mode = PomodoroMode.shortPause;
-        secRemaining = 300;
+        secRemaining = 3; // 300
       }
     } else {
       mode = PomodoroMode.focus;
-      secRemaining = 1500;
+      secRemaining = 10; //1500
     }
   }
 }

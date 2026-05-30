@@ -9,8 +9,8 @@ void main() {
     });
 
     group('estado inicial -', () {
-      test('secRemaining deve ser 1500 ao iniciar', () {
-        expect(p.secRemaining, equals(1500));
+      test('secRemaining deve ser 10 ao iniciar', () {
+        expect(p.secRemaining, equals(10));
       });
       test('isRunning deve ser false ao iniciar', () {
         expect(p.isRunning, isFalse);
@@ -49,7 +49,7 @@ void main() {
       });
       test('reset() retorna ao estado inicial', () {
         p.start();
-        p.secRemaining = 300;
+        p.secRemaining = 3;
         p.mode = PomodoroMode.shortPause;
         p.cycleCount = 2;
         p.reset();
@@ -64,18 +64,18 @@ void main() {
       test('tick() deve decrementar secRemaining em 1', () {
         p.start();
         p.tick();
-        expect(p.secRemaining, equals(1499));
+        expect(p.secRemaining, equals(9));
       });
       test('tick() não deve decrementar se pausado', () {
         p.tick();
-        expect(p.secRemaining, equals(1500));
+        expect(p.secRemaining, equals(10));
       });
       test('tick() decrementa corretamente em múltiplas chamadas', () {
         p.start();
         p.tick();
         p.tick();
         p.tick();
-        expect(p.secRemaining, equals(1497));
+        expect(p.secRemaining, equals(7));
       });
     });
 
@@ -100,47 +100,47 @@ void main() {
           expect(p.focusCount, equals(1));
         });
         test(
-          'quando focus termina com menos de 4 ciclos → shortPause com 300s',
+          'quando focus termina com menos de 4 ciclos → shortPause com 3s',
           () {
             p.secRemaining = 1;
             p.start();
             p.tick();
             expect(p.mode, equals(PomodoroMode.shortPause));
-            expect(p.secRemaining, equals(300));
+            expect(p.secRemaining, equals(3));
           },
         );
         test(
-          'quando terminar o 4º ciclo de focus, a próxima pausa deve ser longa (900s)',
+          'quando terminar o 4º ciclo de focus, a próxima pausa deve ser longa (9s)',
           () {
             p.cycleCount = 3;
             p.secRemaining = 1;
             p.start();
             p.tick();
             expect(p.mode, equals(PomodoroMode.longPause));
-            expect(p.secRemaining, equals(900));
+            expect(p.secRemaining, equals(9));
             expect(p.cycleCount, equals(0));
           },
         );
       });
 
       group('pause → focus', () {
-        test('quando pausa curta termina, volta para focus com 1500s', () {
+        test('quando pausa curta termina, volta para focus com 10s', () {
           p.mode = PomodoroMode.shortPause;
           p.secRemaining = 1;
           p.start();
           p.tick();
           expect(p.mode, equals(PomodoroMode.focus));
-          expect(p.secRemaining, equals(1500));
+          expect(p.secRemaining, equals(10));
         });
         test(
-          'quando pausa longa termina, volta para focus com 1500s e zera cycleCount',
+          'quando pausa longa termina, volta para focus com 10s e zera cycleCount',
           () {
             p.mode = PomodoroMode.longPause;
             p.secRemaining = 1;
             p.start();
             p.tick();
             expect(p.mode, equals(PomodoroMode.focus));
-            expect(p.secRemaining, equals(1500));
+            expect(p.secRemaining, equals(10));
             expect(p.cycleCount, equals(0));
           },
         );

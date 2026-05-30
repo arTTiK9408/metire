@@ -27,13 +27,13 @@ class _ShortcutBar extends StatelessComponent {
           children: [
             TextSpan(text: 'Espaço', style: _TuiAppState._w),
             TextSpan(
-              text: isRunning ? ': Pausar  ' : ': Iniciar  ',
+              text: isRunning ? ' Pausar  ' : ' Iniciar  ',
               style: _TuiAppState._g,
             ),
             TextSpan(text: 'R', style: _TuiAppState._w),
-            TextSpan(text: ': Reset  ', style: _TuiAppState._g),
+            TextSpan(text: ' Reset  ', style: _TuiAppState._g),
             TextSpan(text: 'Q', style: _TuiAppState._w),
-            TextSpan(text: ': Sair', style: _TuiAppState._g),
+            TextSpan(text: ' Sair', style: _TuiAppState._g),
           ],
         ),
       ),
@@ -61,11 +61,13 @@ class _TuiAppState extends State<TuiApp> {
 
   @override
   Component build(BuildContext context) {
-    final cor = switch (p.mode) {
-      PomodoroMode.focus => Colors.green,
-      PomodoroMode.shortPause => Colors.yellow,
-      PomodoroMode.longPause => Colors.red,
-    };
+    final cor = p.isRunning
+        ? switch (p.mode) {
+            PomodoroMode.focus => Colors.green,
+            PomodoroMode.shortPause => Colors.yellow,
+            PomodoroMode.longPause => Colors.red,
+          }
+        : const Color(0x7aa2f7);
 
     final isFocus = p.mode == PomodoroMode.focus;
 
@@ -136,7 +138,10 @@ class _TuiAppState extends State<TuiApp> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text('FOCUS (${p.focusCount})', style: TextStyle(color: isFocus ? cor : _dim.color)),
+        Text(
+          'FOCUS (${p.focusCount})',
+          style: TextStyle(color: isFocus ? cor : _dim.color),
+        ),
         const SizedBox(width: 3),
         Text(
           'PAUSE $_pauseLabel',
