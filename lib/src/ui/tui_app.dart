@@ -42,11 +42,11 @@ class _ShortcutBar extends StatelessComponent {
 }
 
 class _TuiAppState extends State<TuiApp> {
-  static const _mainBg = Color(0x1f2335);
-  static const _altBg = Color(0x292e42);
+  static const _mainBg = Color(0xff1f2335);
+  static const _altBg = Color(0xff292e42);
   static const _w = TextStyle(color: Colors.white);
   static const _g = TextStyle(color: Colors.grey);
-  static const _dim = TextStyle(color: Color(0xFF555555));
+  static const _dim = TextStyle(color: Color(0x80545c7e));
   static const _gap = SizedBox(height: 1);
   static const _keysPad = EdgeInsets.only(left: 4, right: 4, top: 1, bottom: 1);
   late final Pomodoro p;
@@ -81,28 +81,19 @@ class _TuiAppState extends State<TuiApp> {
           children: [
             _gap,
             Row(
-              children: [
-                const SizedBox(width: 2),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: List.generate(4, (i) {
-                    final ativo = i == p.cycleCount;
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 1),
-                      child: Text(
-                        ativo ? '󱓻' : '󱓼',
-                        style: TextStyle(
-                          color: ativo ? Colors.white : Color(0xFF555555),
-                        ),
-                      ),
-                    );
-                  }),
-                ),
-                const Spacer(),
-                Text('● ${p.focusCount}', style: _w, maxLines: 1,
-                    overflow: TextOverflow.ellipsis),
-                const SizedBox(width: 2),
-              ],
+              mainAxisSize: MainAxisSize.min,
+              children: List.generate(4, (i) {
+                final ativo = i == p.cycleCount;
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 1),
+                  child: Text(
+                    ativo ? '󱓻' : '󱓼',
+                    style: TextStyle(
+                      color: ativo ? Colors.white : Color(0xFF555555),
+                    ),
+                  ),
+                );
+              }),
             ),
             const Spacer(),
             Text(
@@ -145,13 +136,10 @@ class _TuiAppState extends State<TuiApp> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
+        Text('FOCUS (${p.focusCount})', style: TextStyle(color: isFocus ? cor : _dim.color)),
+        const SizedBox(width: 3),
         Text(
-          '${isFocus ? "◉" : "○"} FOCUS',
-          style: TextStyle(color: isFocus ? cor : _dim.color),
-        ),
-        const SizedBox(width: 4),
-        Text(
-          '${!isFocus ? "◉" : "○"} PAUSE $_pauseLabel',
+          'PAUSE $_pauseLabel',
           style: TextStyle(color: !isFocus ? cor : _dim.color),
         ),
       ],
