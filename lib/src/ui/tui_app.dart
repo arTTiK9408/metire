@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io' show stdin, Process, Platform;
 
 import 'package:metire/src/models/pomodoro.dart';
+import 'package:metire/src/ui/widgets/counter.dart';
 import 'package:nocterm/nocterm.dart';
 
 class TuiApp extends StatefulComponent {
@@ -97,16 +98,13 @@ class _TuiAppState extends State<TuiApp> {
                 );
               }),
             ),
-            const Spacer(),
-            Text(
-              _formatTime(p.secRemaining),
-              style: TextStyle(color: cor, fontWeight: FontWeight.bold),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
+            Expanded(
+              child: Center(
+                child: TimerCounter(seconds: p.secRemaining, color: cor),
+              ),
             ),
             const SizedBox(height: 1),
             _buildModeRow(cor, isFocus),
-            const Spacer(),
             _ShortcutBar(isRunning: p.isRunning),
             _gap,
           ],
@@ -149,12 +147,6 @@ class _TuiAppState extends State<TuiApp> {
         ),
       ],
     );
-  }
-
-  String _formatTime(int s) {
-    final m = (s ~/ 60).toString().padLeft(2, '0');
-    final sec = (s % 60).toString().padLeft(2, '0');
-    return '$m:$sec';
   }
 
   void _handleKey(LogicalKey key) {
