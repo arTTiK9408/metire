@@ -62,7 +62,7 @@ class _TuiAppState extends State<TuiApp> {
 
   @override
   Component build(BuildContext context) {
-    final cor = p.isRunning
+    final color = p.isRunning
         ? switch (p.mode) {
             PomodoroMode.focus => Colors.green,
             PomodoroMode.shortPause => Colors.yellow,
@@ -98,13 +98,13 @@ class _TuiAppState extends State<TuiApp> {
                 );
               }),
             ),
+            const SizedBox(height: 2),
+            _buildModeRow(color, isFocus),
             Expanded(
               child: Center(
-                child: TimerCounter(seconds: p.secRemaining, color: cor),
+                child: TimerCounter(seconds: p.secRemaining, color: color),
               ),
             ),
-            const SizedBox(height: 1),
-            _buildModeRow(cor, isFocus),
             _ShortcutBar(isRunning: p.isRunning),
             _gap,
           ],
@@ -127,23 +127,25 @@ class _TuiAppState extends State<TuiApp> {
         _timer?.cancel();
         return;
       }
-      if (p.isRunning) p.tick();
-      setState(() {});
+      if (p.isRunning) {
+        p.tick();
+        setState(() {});
+      }
     });
   }
 
-  Component _buildModeRow(Color cor, bool isFocus) {
+  Component _buildModeRow(Color color, bool isFocus) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
           'FOCUS (${p.focusCount})',
-          style: TextStyle(color: isFocus ? cor : _dim.color),
+          style: TextStyle(color: isFocus ? color : _dim.color),
         ),
         const SizedBox(width: 3),
         Text(
           'PAUSE $_pauseLabel',
-          style: TextStyle(color: !isFocus ? cor : _dim.color),
+          style: TextStyle(color: !isFocus ? color : _dim.color),
         ),
       ],
     );
