@@ -20,6 +20,8 @@ const _full = {
     '⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿',
   ],
   '1': [
+    '⣿⣿⣿⣿⣿⣿⣿⡇⠀⠀⠀⠀',
+    '⣿⣿⣿⣿⣿⣿⣿⡇⠀⠀⠀⠀',
     '⠀⠀⠀⠀⢸⣿⣿⡇⠀⠀⠀⠀',
     '⠀⠀⠀⠀⢸⣿⣿⡇⠀⠀⠀⠀',
     '⠀⠀⠀⠀⢸⣿⣿⡇⠀⠀⠀⠀',
@@ -32,10 +34,8 @@ const _full = {
     '⠀⠀⠀⠀⢸⣿⣿⡇⠀⠀⠀⠀',
     '⠀⠀⠀⠀⢸⣿⣿⡇⠀⠀⠀⠀',
     '⠀⠀⠀⠀⢸⣿⣿⡇⠀⠀⠀⠀',
-    '⠀⠀⠀⠀⢸⣿⣿⡇⠀⠀⠀⠀',
-    '⠀⠀⠀⠀⢸⣿⣿⡇⠀⠀⠀⠀',
-    '⠀⠀⠀⠀⢸⣿⣿⡇⠀⠀⠀⠀',
-    '⠀⠀⠀⠀⢸⣿⣿⡇⠀⠀⠀⠀',
+    '⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿',
+    '⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿',
   ],
   '2': [
     '⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿',
@@ -231,14 +231,14 @@ const _half = {
     '⣿⣷⣶⣶⣶⣶⣾⣿',
   ],
   '1': [
+    '⠿⠿⠿⣿⡇⠀⠀⠀',
     '⠀⠀⠀⣿⡇⠀⠀⠀',
     '⠀⠀⠀⣿⡇⠀⠀⠀',
     '⠀⠀⠀⣿⡇⠀⠀⠀',
     '⠀⠀⠀⣿⡇⠀⠀⠀',
     '⠀⠀⠀⣿⡇⠀⠀⠀',
     '⠀⠀⠀⣿⡇⠀⠀⠀',
-    '⠀⠀⠀⣿⡇⠀⠀⠀',
-    '⠀⠀⠀⣿⡇⠀⠀⠀',
+    '⣶⣶⣶⣿⣷⣶⣶⣶',
   ],
   '2': [
     '⠿⠿⠿⠿⠿⠿⢿⣿',
@@ -371,8 +371,8 @@ class TimerCounter extends StatelessComponent {
       builder: (context, constraints) {
         final h = constraints.maxHeight;
         final w = constraints.maxWidth;
-        final useFull = h > 14 && w > 64;
-        final useHalf = h > 6 && w > 44;
+        final useFull = h > 18 && w > 64;
+        final useHalf = h > 10 && w > 44;
 
         if (useFull) {
           return _renderLines(_buildLines(_full));
