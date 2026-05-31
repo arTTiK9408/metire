@@ -47,17 +47,6 @@ metire.exe
 ```
 
 ## Uso
-
-```
-         METIRE TUI
-       󱓻 󱓼 󱓼 󱓼
-     FOCUS (0) PAUSE (S)
-
-            25:00
-
-     Espaço Iniciar  R Reset  Q Sair
-```
-
 | Tecla | Ação |
 |-------|------|
 | `Espaço` | Iniciar / Pausar |
@@ -118,4 +107,3 @@ Funcionalidades planejadas para versões futuras:
 - [ ] **Múltiplos perfis** — suporte a diferentes configurações (ex.: trabalho, estudos, exercícios) alternáveis em tempo de execução
 - [ ] **Modo escuro/claro** — tema alternativo claro para melhor legibilidade em ambientes bem iluminados
 - [ ] **Ícones Nerd Font opcionais** — fallback textual para terminais sem Nerd Font instalada
-- [ ] **Testes de integração** — testes automatizados simulando ciclos completos e interação por teclado
