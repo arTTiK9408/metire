@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+  <metadata>
+    <id>metire</id>
+    <version>1.0</version>
+    <title>Metire</title>
+    <authors>Vitor</authors>
+    <projectUrl>https://github.com/arTTiK9408/metire</projectUrl>
+    <licenseUrl>https://github.com/arTTiK9408/metire/blob/main/LICENSE</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Metire is a TUI Pomodoro timer made as a study project, written in Dart and powered by Nocterm</description>
+    <summary>TUI Pomodoro timer</summary>
+    <releaseNotes>Initial release</releaseNotes>
+    <tags>pomodoro timer tui cli</tags>
+  </metadata>
+  <files>
+    <file src="tools\**" target="tools" />
+  </files>
+</package>

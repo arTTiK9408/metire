@@ -1,0 +1,20 @@
+# Maintainer: Vitor
+pkgname=metire
+pkgver=1.0
+pkgrel=1
+pkgdesc="Metire is a TUI Pomodoro timer made as a study project, written in Dart and powered by Nocterm"
+arch=('x86_64')
+url="https://github.com/arTTiK9408/metire"
+license=('MIT')
+makedepends=('dart')
+source=("$url/archive/v$pkgver.tar.gz")
+sha256sums=('SKIP')
+
+build() {
+  dart pub get
+  dart compile exe bin/metire.dart -o metire
+}
+
+package() {
+  install -Dm755 metire "$pkgdir/usr/bin/metire"
+}

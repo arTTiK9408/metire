@@ -1,12 +1,11 @@
 name: metire
-description: A sample command-line application.
+description: Metire is a TUI Pomodoro timer made as a study project, written in Dart and powered by Nocterm
 version: 1.0.0
-# repository: https://github.com/my_org/my_repo
+repository: https://github.com/arTTiK9408/metire
 
 environment:
   sdk: ^3.12.0
 
-# Add regular dependencies here.
 dependencies:
   nocterm: ^0.4.2
 
