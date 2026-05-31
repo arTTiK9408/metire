@@ -26,15 +26,15 @@ class _ShortcutBar extends StatelessComponent {
         overflow: TextOverflow.ellipsis,
         text: TextSpan(
           children: [
-            TextSpan(text: 'Espaço', style: _TuiAppState._w),
+            TextSpan(text: 'Espaço', style: _TuiAppState._white),
             TextSpan(
               text: isRunning ? ' Pausar  ' : ' Iniciar  ',
-              style: _TuiAppState._g,
+              style: _TuiAppState._grey,
             ),
-            TextSpan(text: 'R', style: _TuiAppState._w),
-            TextSpan(text: ' Reset  ', style: _TuiAppState._g),
-            TextSpan(text: 'Q', style: _TuiAppState._w),
-            TextSpan(text: ' Sair', style: _TuiAppState._g),
+            TextSpan(text: 'R', style: _TuiAppState._white),
+            TextSpan(text: ' Reset  ', style: _TuiAppState._grey),
+            TextSpan(text: 'Q', style: _TuiAppState._white),
+            TextSpan(text: ' Sair', style: _TuiAppState._grey),
           ],
         ),
       ),
@@ -45,12 +45,14 @@ class _ShortcutBar extends StatelessComponent {
 class _TuiAppState extends State<TuiApp> {
   static const _mainBg = Color(0xff1f2335);
   static const _altBg = Color(0xff292e42);
-  static const _w = TextStyle(color: Colors.white);
-  static const _g = TextStyle(color: Colors.grey);
+
   static const _dim = TextStyle(color: Color(0x80545c7e));
+  static const _white = TextStyle(color: Color(0xffc0caf5));
+  static const _grey = TextStyle(color: Color(0xff545c7e));
+
   static const _gap = SizedBox(height: 1);
   static const _keysPad = EdgeInsets.only(left: 4, right: 4, top: 1, bottom: 1);
-  late final Pomodoro p;
+  final p = Pomodoro();
   Timer? _timer;
 
   String get _pauseLabel {
@@ -68,7 +70,7 @@ class _TuiAppState extends State<TuiApp> {
             PomodoroMode.shortPause => Colors.yellow,
             PomodoroMode.longPause => Colors.red,
           }
-        : const Color(0x7aa2f7);
+        : const Color(0xff7aa2f7);
 
     final isFocus = p.mode == PomodoroMode.focus;
 
@@ -83,6 +85,14 @@ class _TuiAppState extends State<TuiApp> {
         child: Column(
           children: [
             _gap,
+            Text(
+              'METIRE TUI',
+              style: TextStyle(
+                color: _white.color,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            _gap,
             Row(
               mainAxisSize: MainAxisSize.min,
               children: List.generate(4, (i) {
@@ -92,13 +102,13 @@ class _TuiAppState extends State<TuiApp> {
                   child: Text(
                     ativo ? '󱓻' : '󱓼',
                     style: TextStyle(
-                      color: ativo ? Colors.white : Color(0xFF555555),
+                      color: ativo ? _white.color : _dim.color,
                     ),
                   ),
                 );
               }),
             ),
-            const SizedBox(height: 2),
+            _gap,
             _buildModeRow(color, isFocus),
             Expanded(
               child: Center(
@@ -121,7 +131,6 @@ class _TuiAppState extends State<TuiApp> {
 
   @override
   void initState() {
-    p = Pomodoro();
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (!mounted) {
         _timer?.cancel();
@@ -158,12 +167,13 @@ class _TuiAppState extends State<TuiApp> {
       } else {
         p.start();
       }
+      setState(() {});
     } else if (key == LogicalKey.keyR) {
       p.reset();
+      setState(() {});
     } else if (key == LogicalKey.keyQ) {
       _shutdown();
     }
-    setState(() {});
   }
 
   void _shutdown() {
@@ -174,11 +184,11 @@ class _TuiAppState extends State<TuiApp> {
     try {
       stdin.lineMode = true;
     } catch (_) {}
-    try {
-      if (Platform.isLinux || Platform.isMacOS) {
+    if (Platform.isLinux || Platform.isMacOS) {
+      try {
         Process.runSync('stty', ['sane']);
-      }
-    } catch (_) {}
+      } catch (_) {}
+    }
     shutdownApp();
   }
 }
