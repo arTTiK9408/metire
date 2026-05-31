@@ -95,21 +95,37 @@ class _TuiAppState extends State<TuiApp> {
             _gap,
             Row(
               mainAxisSize: MainAxisSize.min,
-              children: List.generate(4, (i) {
-                final ativo = i == p.cycleCount;
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 1),
-                  child: Text(
-                    ativo ? '󱓻' : '󱓼',
-                    style: TextStyle(
-                      color: ativo ? _white.color : _dim.color,
-                    ),
+              children: [
+                Container(
+                  padding: _keysPad,
+                  color: _altBg,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: List.generate(4, (i) {
+                          final ativo = i == p.cycleCount;
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 1),
+                            child: Text(
+                              ativo ? '󱓻' : '󱓼',
+                              style: TextStyle(
+                                color: ativo ? _white.color : _dim.color,
+                              ),
+                            ),
+                          );
+                        }),
+                      ),
+                      _gap,
+                      _buildModeRow(color, isFocus),
+                    ],
                   ),
-                );
-              }),
+                ),
+              ],
             ),
             _gap,
-            _buildModeRow(color, isFocus),
+            // _buildModeRow(color, isFocus),
             Expanded(
               child: Center(
                 child: TimerCounter(seconds: p.secRemaining, color: color),
