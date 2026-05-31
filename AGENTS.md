@@ -106,15 +106,13 @@ Project structure for packaging:
 
 ```
 dist/
-├── Makefile                  # build, clean, deb, rpm
+├── Makefile                  # build, clean, deb
 ├── build-deb.sh              # Debian/Ubuntu .deb builder
 ├── arch/
 │   └── PKGBUILD              # Arch Linux / AUR
 ├── debian/
 │   ├── DEBIAN/control
 │   └── usr/bin/
-├── fedora/
-│   └── metire.spec
 └── windows/
     ├── metire.nuspec
     └── tools/chocolateyinstall.ps1
@@ -139,9 +137,6 @@ deb: build
 	mkdir -p dist/debian/usr/bin
 	cp $(BINARY) dist/debian/usr/bin/
 	dpkg-deb --build dist/debian metire_1.0_amd64.deb
-
-rpm: build
-	rpmbuild -ba dist/fedora/metire.spec
 ```
 
 ### GitHub Actions (release.yml)
@@ -249,37 +244,6 @@ Description: Metire is a TUI Pomodoro timer made as a study project, written in 
 
 Build: `dpkg-deb --build dist/debian metire_1.0_amd64.deb`
 
-### Fedora/RHEL — .rpm
-
-`dist/fedora/metire.spec`:
-
-```spec
-Name: metire
-Version: 1.0
-Release: 1
-Summary: Metire is a TUI Pomodoro timer made as a study project, written in Dart and powered by Nocterm
-License: MIT
-URL: https://github.com/arTTiK9408/metire
-Source0: %{url}/archive/v%{version}.tar.gz
-BuildRequires: dart
-
-%description
-Metire is a TUI Pomodoro timer made as a study project, written in Dart and powered by Nocterm.
-
-%prep
-%setup -q
-
-%build
-dart pub get
-dart compile exe bin/metire.dart -o metire
-
-%install
-install -Dm755 metire %{buildroot}%{_bindir}/metire
-
-%files
-%{_bindir}/metire
-```
-
 ### Windows
 
 Option A — Chocolatey package (`dist/windows/metire.nuspec` + `tools/chocolateyinstall.ps1` downloading .exe from GitHub Release).
@@ -299,7 +263,6 @@ A versão atual encontra-se sincronizada em:
 - `pubspec.yaml` — fonte da verdade
 - `dist/debian/DEBIAN/control`
 - `dist/arch/PKGBUILD`
-- `dist/fedora/metire.spec`
 - `dist/windows/metire.nuspec`
 
 ### Fase 1 — Preparação (manual, máquina local)
@@ -343,10 +306,9 @@ A versão atual encontra-se sincronizada em:
 
 ```
 5. Build .deb local:     make deb     → metire_X.Y.Z_amd64.deb
-6. Build .rpm local:     make rpm     (requer rpmbuild)
-7. AUR (Arch Linux):     atualizar PKGBUILD com nova versão e hash
-8. Chocolatey (Windows): atualizar checksum no chocolateyinstall.ps1
-9. Publicar release nos canais desejados
+6. AUR (Arch Linux):     atualizar PKGBUILD com nova versão e hash
+7. Chocolatey (Windows): atualizar checksum no chocolateyinstall.ps1
+8. Publicar release nos canais desejados
 ```
 
 ### Checklist completo
@@ -360,5 +322,5 @@ A versão atual encontra-se sincronizada em:
 [ ] Tag vX.Y.Z criada e pushed
 [ ] GitHub Actions verde
 [ ] Release pública no GitHub
-[ ] (opcional) .deb / .rpm / AUR / Chocolatey
+[ ] (opcional) .deb / AUR / Chocolatey
 ```
