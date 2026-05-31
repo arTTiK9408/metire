@@ -288,11 +288,77 @@ Option B — Release .zip (`metire-windows-x86_64.zip` containing `metire.exe`),
 
 ## Release Workflow
 
+### Versionamento
+
+O projeto segue **SemVer** (`major.minor.patch`):
+- **major** — mudanças incompatíveis ou reescrita significativa
+- **minor** — novas funcionalidades sem quebra de compatibilidade
+- **patch** — correções de bugs e pequenos ajustes
+
+A versão atual encontra-se sincronizada em:
+- `pubspec.yaml` — fonte da verdade
+- `dist/debian/DEBIAN/control`
+- `dist/arch/PKGBUILD`
+- `dist/fedora/metire.spec`
+- `dist/windows/metire.nuspec`
+
+### Fase 1 — Preparação (manual, máquina local)
+
 ```
-1. Develop and commit changes on feature branches
-2. Merge to main when ready
-3. Tag release: git tag -a v1.0 -m "v1.0" && git push origin v1.0
-4. GitHub Actions builds Linux + Windows binaries
-5. GitHub Release created with artifacts attached
-6. (Optional) Update AUR PKGBUILD with new version
+[ ] git checkout main && git pull
+[ ] Verificar se todas as features desejadas estão mergeadas
+[ ] dart test        — 25 testes, todos verdes
+[ ] dart analyze     — zero issues
+[ ] dart run         — smoke test visual rápido
+[ ] CHANGELOG.md     — adicionar entry da nova versão com changelog
+[ ] pubspec.yaml     — atualizar version
+[ ] dist/*           — sincronizar version em todos os arquivos de packaging
+[ ] git add -A && git commit -m "chore(release): bump version to X.Y.Z"
+```
+
+### Fase 2 — Tag e CI/CD (automático via GitHub Actions)
+
+```
+1. Criar a tag:      git tag -a vX.Y.Z -m "vX.Y.Z"
+2. Push da tag:      git push origin vX.Y.Z
+3. GitHub Actions executa automaticamente:
+   a. Job build (matrix Linux + Windows):
+      - setup-dart
+      - dart pub get
+      - dart compile exe → metire (Linux) / metire.exe (Windows)
+      - upload como artifact
+   b. Job release (após build):
+      - download dos artifacts
+      - organiza em release/
+      - softprops/action-gh-release cria GitHub Release com:
+        • metire-linux-x86_64
+        • metire-windows-x86_64.exe
+        • Body: "Metire vX.Y.Z — Linux x86_64 + Windows x86_64"
+4. Verificar no GitHub:
+   - Actions tab → workflow verde
+   - Releases page → release publicada com artifacts
+```
+
+### Fase 3 — Pós-release (manual, opcional)
+
+```
+5. Build .deb local:     make deb     → metire_X.Y.Z_amd64.deb
+6. Build .rpm local:     make rpm     (requer rpmbuild)
+7. AUR (Arch Linux):     atualizar PKGBUILD com nova versão e hash
+8. Chocolatey (Windows): atualizar checksum no chocolateyinstall.ps1
+9. Publicar release nos canais desejados
+```
+
+### Checklist completo
+
+```
+[ ] dart test
+[ ] dart analyze
+[ ] CHANGELOG.md atualizado
+[ ] Versão sincronizada: pubspec.yaml + dist/*
+[ ] Commit "chore(release): bump version to X.Y.Z"
+[ ] Tag vX.Y.Z criada e pushed
+[ ] GitHub Actions verde
+[ ] Release pública no GitHub
+[ ] (opcional) .deb / .rpm / AUR / Chocolatey
 ```
