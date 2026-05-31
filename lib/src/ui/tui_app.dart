@@ -85,14 +85,6 @@ class _TuiAppState extends State<TuiApp> {
         child: Column(
           children: [
             _gap,
-            Text(
-              'METIRE TUI',
-              style: TextStyle(
-                color: _white.color,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            _gap,
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
