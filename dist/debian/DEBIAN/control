@@ -1,7 +1,0 @@
-Package: metire
-Version: 1.0
-Section: utils
-Priority: optional
-Architecture: amd64
-Maintainer: Vitor
-Description: Metire is a TUI Pomodoro timer made as a study project, written in Dart and powered by Nocterm

@@ -49,206 +49,29 @@ dart analyze      # Static analysis
 dart compile exe bin/metire.dart -o metire  # Build native binary
 ```
 
-## Git Workflow
+## Install Script
 
-1. Ensure current branch is committed before starting new work
-2. Never commit directly to `main` — use feature branches
-3. Format: `<type>(<scope>): <description>` (English, imperative, no period)
-4. Types: `feat`, `fix`, `refactor`, `test`, `docs`, `style`, `chore`
-5. Scopes: `pomodoro`, `ui`, `counter`, `release`
-6. Tests (`test:`) precede production code (`feat:`/`fix:`) following TDD
-7. Run `dart test` and `dart analyze` before every commit
-8. Environment: `EDITOR=nvim` on this system. Always use `-m` for commits, or `git -c core.editor=true` for interactive commands
-
-## TDD Workflow (strict)
-
-1. Write/update a test describing expected behavior (it will fail)
-2. Run `dart test` — confirm failure
-3. Write minimal production code to make it pass
-4. Run `dart test` — confirm pass
-5. Run `dart analyze` — confirm no issues
-6. Refactor if needed, keeping tests green
-
-Never introduce or modify production code without corresponding test changes.
-
-## Unit Testing Guidelines
-
-### Naming
-- Test names in **Portuguese**, descriptive of scenario + expected behavior
-- Group format: `'{ClassName} -'` (e.g., `'Pomodoro -'`, `'TuiApp -'`)
-- Instance variable: `{ClassName} {variável}` (e.g., `Pomodoro p`)
-- Test name pattern: `'[cenário] → [comportamento esperado]'`
-  - Examples: `'quando focus termina com menos de 4 ciclos → shortPause com 300s'`, `'tick() não deve decrementar se pausado'`
-
-### Characteristics
-- **Full isolation:** each test starts with clean state via `setUp()` creating a new instance
-- **Zero external dependencies:** no filesystem, network, database, or external APIs
-- **Behavioral focus:** exactly one assertion per test
-- **Determinism:** same input → same output, no randomness or real timers
-- **Speed:** execution in milliseconds (avoid `sleep()`, `Future.delayed()`)
-
-### Edge Case Coverage
-- Initial states: verify all default constructor values
-- Boundary values: tests with 0, 1, and domain-specific limits
-- Invalid states: ensure operations don't corrupt the object
-- State transitions: cover all possible paths between model states
-- Idempotent operations: verify multiple calls don't change result
-- Underflow/overflow protection where applicable
-- Operation validity: test behaviors in states where operation should have no effect
-
-### Current Tests
-- `test/src/models/pomodoro_test.dart` — 21 tests, group `'Pomodoro -'`, variable `Pomodoro p`
-- `test/src/ui/tui_app_test.dart` — 4 tests, group `'TuiApp -'`, rendering and keyboard shortcuts
-
-## Packaging & Distribution
-
-Project structure for packaging:
-
-```
-dist/
-├── Makefile                  # build, clean, deb
-├── build-deb.sh              # Debian/Ubuntu .deb builder
-├── arch/
-│   └── PKGBUILD              # Arch Linux / AUR
-├── debian/
-│   ├── DEBIAN/control
-│   └── usr/bin/
-└── windows/
-    ├── metire.nuspec
-    └── tools/chocolateyinstall.ps1
-
-.github/workflows/
-└── release.yml               # CI/CD: build Linux + Windows, create GitHub Release
-```
-
-### Makefile
-
-```makefile
-BINARY = metire
-
-build:
-	dart pub get
-	dart compile exe bin/metire.dart -o $(BINARY)
-
-clean:
-	rm -f $(BINARY)
-
-deb: build
-	mkdir -p dist/debian/usr/bin
-	cp $(BINARY) dist/debian/usr/bin/
-	dpkg-deb --build dist/debian metire_1.0_amd64.deb
-```
-
-### GitHub Actions (release.yml)
-
-Triggered on tag push `v*`:
-
-```yaml
-on:
-  push:
-    tags: ['v*']
-
-jobs:
-  build:
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest]
-    runs-on: ${{ matrix.os }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: dart-lang/setup-dart@v1
-      - run: dart pub get
-      - run: dart compile exe bin/metire.dart -o metire${{ runner.os == 'Windows' && '.exe' || '' }}
-      - uses: actions/upload-artifact@v4
-        with:
-          name: metire-${{ runner.os }}
-          path: metire${{ runner.os == 'Windows' && '.exe' || '' }}
-
-  release:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/download-artifact@v4
-      - run: |
-          mkdir release
-          mv metire-Linux/metire release/metire-linux-x86_64
-          mv metire-Windows/metire.exe release/metire-windows-x86_64.exe
-      - uses: softprops/action-gh-release@v2
-        with:
-          files: release/*
-          body: |
-            **Metire v${{ github.ref_name }}**
-
-            - Linux x86_64 binary (statically linked, no dependencies)
-            - Windows x86_64 binary
-```
-
-### Docker (cross-compilation helper)
-
-```dockerfile
-FROM dart:stable AS build
-WORKDIR /app
-COPY . .
-RUN dart pub get && dart compile exe bin/metire.dart -o metire
-
-FROM scratch
-COPY --from=build /app/metire /metire
-ENTRYPOINT ["/metire"]
-```
-
-### Package Descriptions
-
-All packages use:
-
-> **Description:** Metire is a TUI Pomodoro timer made as a study project, written in Dart and powered by Nocterm
-
-### Arch Linux (AUR) — PKGBUILD
-
-`dist/arch/PKGBUILD` compiles from source during install:
+The project provides a universal installer inspired by starship.rs:
 
 ```bash
-pkgname=metire
-pkgver=1.0
-pkgrel=1
-pkgdesc="Metire is a TUI Pomodoro timer made as a study project, written in Dart and powered by Nocterm"
-arch=('x86_64')
-url="https://github.com/arTTiK9408/metire"
-license=('MIT')
-makedepends=('dart')
-source=("$url/archive/v$pkgver.tar.gz")
-sha256sums=('SKIP')
+# Install
+curl -sS https://raw.githubusercontent.com/arTTiK9408/metire/main/install.sh | sh
 
-build() {
-  dart pub get
-  dart compile exe bin/metire.dart -o metire
-}
-
-package() {
-  install -Dm755 metire "$pkgdir/usr/bin/metire"
-}
+# Uninstall
+curl -sS https://raw.githubusercontent.com/arTTiK9408/metire/main/uninstall.sh | sh
 ```
 
-### Debian/Ubuntu — .deb
+The `install.sh` script:
+- Detects OS (Linux/macOS) and architecture (x86_64/aarch64)
+- Fetches the latest release tag from GitHub API (no manual version bumps)
+- Downloads the correct binary from GitHub Releases
+- Installs to `/usr/local/bin` (uses `sudo` if needed)
+- Validates ELF/Mach-O header before installation
+- Supports `INSTALL_DIR=~/.local/bin curl ...` for custom paths
 
-`dist/debian/DEBIAN/control`:
-
-```
-Package: metire
-Version: 1.0
-Section: utils
-Priority: optional
-Architecture: amd64
-Maintainer: Vitor
-Description: Metire is a TUI Pomodoro timer made as a study project, written in Dart and powered by Nocterm
-```
-
-Build: `dpkg-deb --build dist/debian metire_1.0_amd64.deb`
-
-### Windows
-
-Option A — Chocolatey package (`dist/windows/metire.nuspec` + `tools/chocolateyinstall.ps1` downloading .exe from GitHub Release).
-
-Option B — Release .zip (`metire-windows-x86_64.zip` containing `metire.exe`), generated by GitHub Actions.
+The `uninstall.sh` script:
+- Searches common install paths (`/usr/local/bin`, `/usr/bin`, `~/.local/bin`, `~/bin`)
+- Removes the binary with `sudo` if needed
 
 ## Release Workflow
 
@@ -259,11 +82,7 @@ O projeto segue **SemVer** (`major.minor.patch`):
 - **minor** — novas funcionalidades sem quebra de compatibilidade
 - **patch** — correções de bugs e pequenos ajustes
 
-A versão atual encontra-se sincronizada em:
-- `pubspec.yaml` — fonte da verdade
-- `dist/debian/DEBIAN/control`
-- `dist/arch/PKGBUILD`
-- `dist/windows/metire.nuspec`
+A versão atual está em `pubspec.yaml`.
 
 ### Fase 1 — Preparação (manual, máquina local)
 
@@ -275,7 +94,6 @@ A versão atual encontra-se sincronizada em:
 [ ] dart run         — smoke test visual rápido
 [ ] CHANGELOG.md     — adicionar entry da nova versão com changelog
 [ ] pubspec.yaml     — atualizar version
-[ ] dist/*           — sincronizar version em todos os arquivos de packaging
 [ ] git add -A && git commit -m "chore(release): bump version to X.Y.Z"
 ```
 
@@ -302,25 +120,15 @@ A versão atual encontra-se sincronizada em:
    - Releases page → release publicada com artifacts
 ```
 
-### Fase 3 — Pós-release (manual, opcional)
-
-```
-5. Build .deb local:     make deb     → metire_X.Y.Z_amd64.deb
-6. AUR (Arch Linux):     atualizar PKGBUILD com nova versão e hash
-7. Chocolatey (Windows): atualizar checksum no chocolateyinstall.ps1
-8. Publicar release nos canais desejados
-```
-
 ### Checklist completo
 
 ```
 [ ] dart test
 [ ] dart analyze
 [ ] CHANGELOG.md atualizado
-[ ] Versão sincronizada: pubspec.yaml + dist/*
+[ ] pubspec.yaml versionado
 [ ] Commit "chore(release): bump version to X.Y.Z"
 [ ] Tag vX.Y.Z criada e pushed
 [ ] GitHub Actions verde
 [ ] Release pública no GitHub
-[ ] (opcional) .deb / AUR / Chocolatey
 ```

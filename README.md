@@ -11,42 +11,30 @@
 
 ## Instalação
 
-### Binário pré-compilado (Linux x86_64)
-
-Baixe o binário da [página de releases](https://github.com/arTTiK9408/metire/releases):
+### Linux / macOS (recomendado)
 
 ```bash
-chmod +x metire-linux-x86_64
-./metire-linux-x86_64
+curl -sS https://raw.githubusercontent.com/arTTiK9408/metire/main/install.sh | sh
 ```
 
-### Via Dart
+### Windows
+
+Baixe o binário da [página de releases](https://github.com/arTTiK9408/metire/releases) e execute `metire-windows-x86_64.exe`.
+
+### Via Dart (desenvolvimento)
 
 ```bash
 dart run
 ```
 
-### Arch Linux (AUR)
+## Desinstalação
 
 ```bash
-yay -S metire
-```
-
-### Debian/Ubuntu
-
-```bash
-sudo dpkg -i metire_1.0_amd64.deb
-metire
-```
-
-### Windows (Chocolatey)
-
-```powershell
-choco install metire
-metire.exe
+curl -sS https://raw.githubusercontent.com/arTTiK9408/metire/main/uninstall.sh | sh
 ```
 
 ## Uso
+
 | Tecla | Ação |
 |-------|------|
 | `Espaço` | Iniciar / Pausar |
@@ -80,7 +68,8 @@ lib/
         └── widgets/
             └── counter.dart — contador Braille
 test/                        — testes unitários (25)
-dist/                        — packaging (Arch, Debian, Windows)
+install.sh                   — instalador universal
+uninstall.sh                 — removedor universal
 .github/workflows/           — CI/CD
 ```
 
