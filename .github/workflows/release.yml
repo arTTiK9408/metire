@@ -31,6 +31,6 @@ jobs:
         with:
           files: release/*
           body: |
-            **Metire v${{ github.ref_name }}**
+            **Metire ${{ github.ref_name }}**
 
             - Linux x86_64 binary (statically linked, no dependencies)
