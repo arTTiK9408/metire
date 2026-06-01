@@ -26,15 +26,15 @@ class _ShortcutBar extends StatelessComponent {
         overflow: TextOverflow.ellipsis,
         text: TextSpan(
           children: [
-            TextSpan(text: 'Espaço', style: _TuiAppState._white),
+            TextSpan(text: 'Space', style: _TuiAppState._white),
             TextSpan(
-              text: isRunning ? ' Pausar  ' : ' Iniciar  ',
+              text: isRunning ? ' Stop  ' : ' Start  ',
               style: _TuiAppState._grey,
             ),
             TextSpan(text: 'R', style: _TuiAppState._white),
             TextSpan(text: ' Reset  ', style: _TuiAppState._grey),
             TextSpan(text: 'Q', style: _TuiAppState._white),
-            TextSpan(text: ' Sair', style: _TuiAppState._grey),
+            TextSpan(text: ' Quit ', style: _TuiAppState._grey),
           ],
         ),
       ),
