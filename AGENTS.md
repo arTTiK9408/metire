@@ -103,18 +103,17 @@ A versão atual está em `pubspec.yaml`.
 1. Criar a tag:      git tag -a vX.Y.Z -m "vX.Y.Z"
 2. Push da tag:      git push origin vX.Y.Z
 3. GitHub Actions executa automaticamente:
-   a. Job build (matrix Linux + Windows):
+   a. Job build (Linux):
       - setup-dart
       - dart pub get
-      - dart compile exe → metire (Linux) / metire.exe (Windows)
+      - dart compile exe → metire
       - upload como artifact
    b. Job release (após build):
       - download dos artifacts
       - organiza em release/
       - softprops/action-gh-release cria GitHub Release com:
         • metire-linux-x86_64
-        • metire-windows-x86_64.exe
-        • Body: "Metire vX.Y.Z — Linux x86_64 + Windows x86_64"
+        • Body: "Metire vX.Y.Z — Linux x86_64"
 4. Verificar no GitHub:
    - Actions tab → workflow verde
    - Releases page → release publicada com artifacts

@@ -6,19 +6,16 @@ on:
 
 jobs:
   build:
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest]
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: dart-lang/setup-dart@v1
       - run: dart pub get
-      - run: dart compile exe bin/metire.dart -o metire${{ runner.os == 'Windows' && '.exe' || '' }}
+      - run: dart compile exe bin/metire.dart -o metire
       - uses: actions/upload-artifact@v4
         with:
-          name: metire-${{ runner.os }}
-          path: metire${{ runner.os == 'Windows' && '.exe' || '' }}
+          name: metire-Linux
+          path: metire
 
   release:
     needs: build
@@ -30,7 +27,6 @@ jobs:
       - run: |
           mkdir release
           mv metire-Linux/metire release/metire-linux-x86_64
-          mv metire-Windows/metire.exe release/metire-windows-x86_64.exe
       - uses: softprops/action-gh-release@v2
         with:
           files: release/*
@@ -38,4 +34,3 @@ jobs:
             **Metire v${{ github.ref_name }}**
 
             - Linux x86_64 binary (statically linked, no dependencies)
-            - Windows x86_64 binary

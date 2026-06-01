@@ -17,10 +17,6 @@
 curl -sS https://raw.githubusercontent.com/arTTiK9408/metire/main/install.sh | sh
 ```
 
-### Windows
-
-Baixe o binário da [página de releases](https://github.com/arTTiK9408/metire/releases) e execute `metire-windows-x86_64.exe`.
-
 ### Via Dart (desenvolvimento)
 
 ```bash
