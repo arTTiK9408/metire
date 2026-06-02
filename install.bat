@@ -17,11 +17,9 @@ if /i "%PROCESSOR_ARCHITECTURE%"=="AMD64" (set "ARCH=x86_64") else (
 
 set "ASSET=metire-windows-%ARCH%.exe"
 
-REM Fetch latest release tag via PowerShell (write to temp file for reliability)
+REM Fetch latest release tag via PowerShell
 echo Looking up latest release...
-powershell -NoProfile -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; try { $r = Invoke-RestMethod 'https://api.github.com/repos/%REPO%/releases/latest' -EA Stop; Write-Output $r.tag_name } catch { Write-Output 'error' }" > "%TEMP%\metire_tag.txt"
-set /p TAG=<"%TEMP%\metire_tag.txt"
-del "%TEMP%\metire_tag.txt" 2>nul
+for /f "usebackq delims=" %%t in (`powershell -NoProfile -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; try { $r = Invoke-RestMethod 'https://api.github.com/repos/%REPO%/releases/latest' -EA Stop; Write-Output $r.tag_name } catch { Write-Output 'error' }"`) do set "TAG=%%t"
 
 if "%TAG%"=="error" (echo Failed to fetch latest release & exit /b 1)
 if "%TAG%"=="" (echo Failed to fetch latest release & exit /b 1)
