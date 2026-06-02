@@ -10,7 +10,7 @@ void main() {
       expect(tester.terminalState, containsText('FOCUS (0)'));
       expect(tester.terminalState, containsText('PAUSE (S)'));
       expect(tester.terminalState, containsText('󱓻'));
-      expect(tester.terminalState, containsText('Q Sair'));
+      expect(tester.terminalState, containsText('Q Quit'));
       expect(tester.terminalState, containsText('⣿'));
     });
   });

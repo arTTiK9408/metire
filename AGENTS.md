@@ -8,7 +8,7 @@ Metire is a TUI Pomodoro timer made as a study project, written in Dart and powe
 - **Build binary:** `dart compile exe bin/metire.dart -o metire`
 - **Deps:** `nocterm`; dev deps: `lints`, `test`
 - **SDK:** Dart ^3.12.0
-- **Library root:** `lib/metire.dart` exports `Pomodoro`
+- **Library root:** `lib/metire.dart` exports `Pomodoro` and `TuiApp`
 
 ## Architecture
 
@@ -49,21 +49,18 @@ dart analyze      # Static analysis
 dart compile exe bin/metire.dart -o metire  # Build native binary
 ```
 
-## Install Script
+## Install Scripts
 
-The project provides a universal installer inspired by starship.rs:
+### Linux / macOS
 
 ```bash
-# Install
 curl -sS https://raw.githubusercontent.com/arTTiK9408/metire/main/install.sh | sh
-
-# Uninstall
 curl -sS https://raw.githubusercontent.com/arTTiK9408/metire/main/uninstall.sh | sh
 ```
 
 The `install.sh` script:
 - Detects OS (Linux/macOS) and architecture (x86_64/aarch64)
-- Fetches the latest release tag from GitHub API (no manual version bumps)
+- Fetches the latest release tag from GitHub API
 - Downloads the correct binary from GitHub Releases
 - Installs to `/usr/local/bin` (uses `sudo` if needed)
 - Validates ELF/Mach-O header before installation
@@ -73,61 +70,81 @@ The `uninstall.sh` script:
 - Searches common install paths (`/usr/local/bin`, `/usr/bin`, `~/.local/bin`, `~/bin`)
 - Removes the binary with `sudo` if needed
 
+### Windows
+
+```cmd
+curl -sS https://raw.githubusercontent.com/arTTiK9408/metire/main/install.bat | cmd
+curl -sS https://raw.githubusercontent.com/arTTiK9408/metire/main/uninstall.bat | cmd
+```
+
+The `install.bat` script:
+- Detects architecture (x86_64/aarch64)
+- Fetches the latest release tag via PowerShell
+- Downloads `metire-windows-x86_64.exe` from GitHub Releases
+- Installs to `%USERPROFILE%\.metire\bin\metire.exe`
+- Adds the directory to the user PATH
+
+The `uninstall.bat` script:
+- Removes `metire.exe` and the `.metire\bin` directory
+- Removes the directory from the user PATH
+
 ## Release Workflow
 
-### Versionamento
+### Versioning
 
-O projeto segue **SemVer** (`major.minor.patch`):
-- **major** — mudanças incompatíveis ou reescrita significativa
-- **minor** — novas funcionalidades sem quebra de compatibilidade
-- **patch** — correções de bugs e pequenos ajustes
+The project follows **SemVer** (`major.minor.patch`):
+- **major** — incompatible changes or significant rewrites
+- **minor** — new features without breaking compatibility
+- **patch** — bug fixes and small tweaks
 
-A versão atual está em `pubspec.yaml`.
+The current version is in `pubspec.yaml`.
 
-### Fase 1 — Preparação (manual, máquina local)
+### Phase 1 — Preparation (manual, local machine)
 
 ```
 [ ] git checkout main && git pull
-[ ] Verificar se todas as features desejadas estão mergeadas
-[ ] dart test        — 25 testes, todos verdes
+[ ] Verify all desired features are merged
+[ ] dart test        — 25 tests, all green
 [ ] dart analyze     — zero issues
-[ ] dart run         — smoke test visual rápido
-[ ] CHANGELOG.md     — adicionar entry da nova versão com changelog
-[ ] pubspec.yaml     — atualizar version
+[ ] dart run         — quick visual smoke test
+[ ] CHANGELOG.md     — add new version entry with changelog
+[ ] pubspec.yaml     — update version
 [ ] git add -A && git commit -m "chore(release): bump version to X.Y.Z"
 ```
 
-### Fase 2 — Tag e CI/CD (automático via GitHub Actions)
+### Phase 2 — Tag and CI/CD (automatic via GitHub Actions)
 
 ```
-1. Criar a tag:      git tag -a vX.Y.Z -m "vX.Y.Z"
-2. Push da tag:      git push origin vX.Y.Z
-3. GitHub Actions executa automaticamente:
-   a. Job build (Linux):
+1. Create tag:     git tag -a vX.Y.Z -m "vX.Y.Z"
+2. Push tag:       git push origin vX.Y.Z
+3. GitHub Actions runs automatically:
+   a. Build jobs (matrix: Linux + Windows):
       - setup-dart
       - dart pub get
-      - dart compile exe → metire
-      - upload como artifact
-   b. Job release (após build):
-      - download dos artifacts
-      - organiza em release/
-      - softprops/action-gh-release cria GitHub Release com:
+      - dart compile exe → binary
+      - rename to asset (metire-linux-x86_64 / metire-windows-x86_64.exe)
+      - upload as artifact
+   b. Release job (after all builds succeed):
+      - download all artifacts
+      - merge into release/
+      - softprops/action-gh-release creates GitHub Release with:
         • metire-linux-x86_64
-        • Body: "Metire vX.Y.Z — Linux x86_64"
-4. Verificar no GitHub:
-   - Actions tab → workflow verde
-   - Releases page → release publicada com artifacts
+        • metire-windows-x86_64.exe
+        • Body: "Metire vX.Y.Z\n\n- Linux x86_64 binary\n- Windows x86_64 binary"
+4. Verify on GitHub:
+   - Actions tab → green workflow
+   - Releases page → release published with both artifacts
 ```
 
-### Checklist completo
+### Full checklist
 
 ```
 [ ] dart test
 [ ] dart analyze
-[ ] CHANGELOG.md atualizado
-[ ] pubspec.yaml versionado
+[ ] CHANGELOG.md updated
+[ ] pubspec.yaml versioned
 [ ] Commit "chore(release): bump version to X.Y.Z"
-[ ] Tag vX.Y.Z criada e pushed
-[ ] GitHub Actions verde
-[ ] Release pública no GitHub
+[ ] Tag vX.Y.Z created and pushed
+[ ] GitHub Actions green
+[ ] Release published on GitHub
 ```

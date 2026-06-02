@@ -1,52 +1,70 @@
 # Metire
 
-**Metire** é um timer Pomodoro TUI com contador em Braille 8-dot, construído com Dart e Nocterm. Seguindo os princípios originais criados por Francesco Cirillo
+**Metire** is a TUI Pomodoro timer with an 8-dot Braille counter, built with Dart and Nocterm. Following the original principles created by Francesco Cirillo.
 
-## About/Sobre
+## About
 
-Este é um projeto de estudo desenvolvido com assistência do **opencode** (modelo `big-pickle`), explorando conceitos de TUI com Nocterm, TDD, packaging multi-plataforma e CI/CD com GitHub Actions
+This is a study project developed with assistance from **opencode** (and free models), exploring TUI concepts with Nocterm, TDD, multi-platform packaging and CI/CD with GitHub Actions.
 
-## Install/Instalação
+## Install
+
+### Linux / macOS
 
 ```bash
 curl -sS https://raw.githubusercontent.com/arTTiK9408/metire/main/install.sh | sh
 ```
 
-## Uninstall/Desinstalação
+### Windows
+
+```bash
+curl -sS https://raw.githubusercontent.com/arTTiK9408/metire/main/install.bat | cmd
+```
+
+## Uninstall
+
+### Linux / macOS
 
 ```bash
 curl -sS https://raw.githubusercontent.com/arTTiK9408/metire/main/uninstall.sh | sh
 ```
 
-## Usage/Uso
+### Windows
 
-| Key/Tecla | Action/Ação |
+```bash
+curl -sS https://raw.githubusercontent.com/arTTiK9408/metire/main/uninstall.bat | cmd
+```
+
+## Usage
+
+| Key | Action |
 |-------|------|
 | `Space` | Start/Stop |
 | `R` | Reset |
 | `Q` | Quit |
 
-### Cycles/Ciclos
+### Cycles
 
-- **Foco:** 25 minutos (1500s)
-- **Pausa curta:** 5 minutos (300s) — até 3 ciclos
-- **Pausa longa:** 15 minutos (900s) — 4º ciclo, então reinicia
+- **Focus:** 25 minutes (1500s)
+- **Short pause:** 5 minutes (300s) — up to 3 cycles
+- **Long pause:** 15 minutes (900s) — 4th cycle, then resets
 
-> [Princípios](https://pt.wikipedia.org/wiki/T%C3%A9cnica_pomodoro#Princ%C3%ADpios)
-> 1. Escolher a tarefa ou tarefas a serem executadas;
-> 2. Ajustar o cronômetro para o tempo desejado (geralmente 25 minutos);
-> 3. Trabalhar na tarefa escolhida até que o alarme toque. Se alguma distração importante surgir, anotá-la e voltar o foco à tarefa;
-> 4. Quando o alarme tocar, fazer uma marcação em um papel para contabilizar o intervalo;
-> 5. Se houver menos de 4 marcações, fazer uma pausa curta (3–5 minutos);
-> 6. Após a quarta marcação, fazer uma pausa mais longa (20–30 minutos), zerar a contagem e retornar ao passo 1.
+The original technique has six steps:
+> 1. Deciding on the task to be done
+> 2. Setting the Pomodoro timer (typically for 25 minutes)
+> 3. Working on the task
+> 4. Ending work when the timer rings and taking a short break (typically 5–10 minutes)
+> 5. Going back to Step 2 and repeating until one completes four pomodori
+> 6. After four pomodori are done, one takes a long break (typically 20 to 30 minutes) instead of a short break. Once the long break is finished, one returns to step 2
 
-## Roadmap/Planejamento
+For the purposes of the technique, a pomodoro is an interval of work time (and pomodori is the plural form)
 
-- [ ] **Sessões persistentes** — salvar e restaurar o estado do timer entre execuções, com estatísticas acumuladas de ciclos concluídos e tempo total de foco
-- [ ] **Arquivo de configuração** — personalizar cores, tempos dos modos e atalhos de teclado via arquivo YAML/JSON (`~/.config/metire/config.yaml`)
-- [ ] **Notificações e alerta sonoro** — sinal ao final de cada modo (foco, pausa curta, pausa longa), com suporte a notificações do sistema e beep no terminal
-- [ ] **Tempos personalizáveis** — permitir ajustar durações de foco, pausa curta e pausa longa na interface ou no arquivo de configuração
-- [ ] **Log de histórico** — registro local das sessões concluídas com data, duração e modo, exportável em CSV/JSON
-- [ ] **Múltiplos perfis** — suporte a diferentes configurações (ex.: trabalho, estudos, exercícios) alternáveis em tempo de execução
-- [ ] **Modo escuro/claro** — tema alternativo claro para melhor legibilidade em ambientes bem iluminados
-- [ ] **Ícones Nerd Font opcionais** — fallback textual para terminais sem Nerd Font instalada
+## Roadmap
+
+- [ ] **Persistent sessions** — save and restore timer state across runs, with accumulated statistics of completed cycles and total focus time
+- [ ] **Configuration file** — customize colors, mode durations and keyboard shortcuts via YAML/JSON file (`~/.config/metire/config.yaml`)
+- [ ] **Notifications and sound alerts** — signal at the end of each mode (focus, short pause, long pause), with system notification and terminal beep support
+- [ ] **Customizable durations** — allow adjusting focus, short pause and long pause durations from the interface or config file
+- [ ] **History log** — local record of completed sessions with date, duration and mode, exportable in CSV/JSON
+- [ ] **Multiple profiles** — support for different configurations (e.g., work, study, exercise) switchable at runtime
+- [ ] **Light/dark mode** — alternative light theme for better readability in bright environments
+- [ ] **Optional Nerd Font icons** — textual fallback for terminals without Nerd Font installed
