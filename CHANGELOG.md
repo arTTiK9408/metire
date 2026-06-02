@@ -9,9 +9,6 @@
 ### Changed
 - Release workflow now builds for Linux x86_64 and Windows x86_64
 
-### Fixed
-- Windows CMD high-CPU hang: upgraded nocterm to 0.6.0 (native Windows Console API support)
-
 ## [1.0.0] - 2026-05-31
 
 ### Added
